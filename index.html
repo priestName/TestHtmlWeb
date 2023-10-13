@@ -136,82 +136,84 @@
 				case 30:
 					s = '三十';
 					break;
-				default:
-					s = nStr2[Math.floor(d / 10)];
-					s += nStr1[d % 10];
-					break;
+				系统默认值:
+s = nStr2[数学。地面(d /10)];
+s += nStr1[d %10];
+					破裂;
 			}
-			return (s);
+			返回 (s);
 		}
-		function GetcMon(m) {
-			if (m == 1) return '正';
-			else return nStr1[m];
+		功能 GetcMon(m) {
+			如果 (m ==1) 返回 '正';
+			其他 返回nStr1[m];
 		}
-		function GetShiChen(){
-			switch(nhrs)
+		功能 格什辰(){
+			转换(nhrs)
 			{
-				case 23:
-				case 0:
-					return 0;
-				case 1:
-				case 2:
-					return 1;
-				case 3:
-				case 4:
-					return 2;
-				case 5:
-				case 6:
-					return 3;
-				case 7:
-				case 8:
-					return 4;
-				case 9:
-				case 10:
-					return 5;
-				case 11:
-				case 12:
-					return 6;
-				case 13:
-				case 14:
-					return 7;
-				case 15:
-				case 16:
-					return 8;
-				case 17:
-				case 18:
-					return 9;
-				case 19:
-				case 20:
-					return 10;
-				case 21:
-				case 22:
-					return 11;
-				default:
-					return undefined;
-					break;
+				情况 23:
+				情况 0:
+					返回 0;
+				情况 1:
+				情况 2:
+					返回 1;
+				情况 3:
+				情况 4:
+					返回 2;
+				情况 5:
+				情况 6:
+					返回 3;
+				情况 7:
+				情况 8:
+					返回 4;
+				情况 9:
+				情况 10:
+					返回 5;
+				情况 11:
+				情况 12:
+					返回 6;
+				情况 13:
+				情况 14:
+					返回 7;
+				情况 15:
+				情况 16:
+					返回 8;
+				情况 17:
+				情况 18:
+					返回 9;
+				情况 19:
+				情况 20:
+					返回 10;
+				情况 21:
+				情况 22:
+					返回 11;
+				系统默认值:
+					返回未定义；
+					破裂;
 			}
 		}
-		function getlunar() {
-			var lObj = new Lunar(nyear, nmonth - 1, nday);
-			lmonth = GetcMon(lObj.month);
-			lday = GetcDay(lObj.day);
-			lleap = lObj.isLeap;
-			if (lleap == 1) {
-				lmonth = "闰" + lmonth;
+		功能 获取月球() {
+			定义变量 lObj = 新的月亮的(尼尔，n月-1，nday);
+l月=GetcMon(lObj。月);
+lday =GetcDay(lObj。天);
+lleap = lObj。isLeap;
+			如果 (lleap ==1) {
+l月="闰"+lmonth；
 			}
-			shichen = GetShiChen()
-			liuren(lObj);
+陈石=格什辰()
+			刘仁(lObj);
 		}
-		var liurenStr = ["大安","留连","速喜","赤口","小吉","空亡"];
-		function liuren(lObj) {
-			let i = lObj.month + lObj.day + shichen + 1 - 2
-			i%=6
-			let a = liurenStr[i-1]
-			document.getElementById("jieguo").innerText = a
-			console.log(a)
+		定义变量 柳伦斯特 = ["大安","留连","速喜","赤口","小吉","空亡"];
+		功能 刘仁(lObj) {
+			让 i= lObj。月+ lObj。天+陈石+1 - 2
+我%=6
+			如果(我==0)
+我=6
+			让 a= liurenStr[异1]
+文档。getElementById(《郭解》).内部文本= a
+控制台。原木(a)
 		}
 		//阴历函数结束
-		Draw();
-		/**获取阴历 end*/
-	</script>
-</html>
+		画();
+		/**获取阴历end*/
+	</脚本>
+</超文本标记语言>
