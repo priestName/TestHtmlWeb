@@ -1,0 +1,67 @@
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>随机号码生成器</title>  
+</head>  
+<body>  
+    <h1>随机号码生成器</h1>  
+  
+    <h2>双色球</h2>  
+    <input type="number" id="doubleColorGroups" value="1" min="1"> 组  
+    <button onclick="generateDoubleColor()">生成双色球号码</button>  
+    <p id="doubleColorResult"></p>  
+  
+    <h2>大乐透</h2>  
+    <input type="number" id="daLeTouGroups" value="1" min="1"> 组  
+    <button onclick="generateDaLeTou()">生成大乐透号码</button>  
+    <p id="daLeTouResult"></p>  
+  
+    <script src="randomNumbers.js"></script>  
+</body>  
+<script>
+function generateRandomNumbers(count, max) {  
+    let numbers = [];  
+    while (numbers.length < count) {  
+        let randomNum = Math.floor(Math.random() * max) + 1;  
+        if (!numbers.includes(randomNum)) {  
+            numbers.push(randomNum);  
+        }  
+    }  
+    numbers.sort((a, b) => a - b);  
+    return numbers;  
+}  
+  
+function generateDoubleColor(groups) {  
+    let result = '';  
+    for (let i = 0; i < groups; i++) {  
+        const redBalls = generateRandomNumbers(6, 33); // 红球从1-33选6个  
+        const blueBalls = generateRandomNumbers(1, 16); // 蓝球从1-16选1个  
+        result += `组${i + 1}: 红球: ${redBalls.join(', ')}, 蓝球: ${blueBalls[0]}\n`;  
+    }  
+    document.getElementById('doubleColorResult').innerText = result;  
+}  
+  
+function generateDaLeTou(groups) {  
+    let result = '';  
+    for (let i = 0; i < groups; i++) {  
+        const frontNumbers = generateRandomNumbers(5, 35); // 前区从1-35选5个  
+        const rearNumbers = generateRandomNumbers(2, 12); // 后区从1-12选2个  
+        result += `组${i + 1}: 前区: ${frontNumbers.join(', ')}, 后区: ${rearNumbers.join(', ')}\n`;  
+    }  
+    document.getElementById('daLeTouResult').innerText = result;  
+}  
+  
+// 修改按钮点击事件以传递组数  
+document.querySelector('[onclick="generateDoubleColor()"]').onclick = function() {  
+    const groups = parseInt(document.getElementById('doubleColorGroups').value, 10) || 1;  
+    generateDoubleColor(groups);  
+};  
+  
+document.querySelector('[onclick="generateDaLeTou()"]').onclick = function() {  
+    const groups = parseInt(document.getElementById('daLeTouGroups').value, 10) || 1;  
+    generateDaLeTou(groups);  
+};
+</script>
+</html>
