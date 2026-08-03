@@ -5,7 +5,10 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0a0a14">
-<title>暗夜生存者</title>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>暗夜生存者 · 仙侠×科幻</title>
 <style>
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;}
   html,body{width:100%;height:100%;overflow:hidden;background:#05050a;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;touch-action:none;color:#fff;}
@@ -34,33 +37,71 @@
   /* 屏幕 */
   .screen{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,rgba(20,5,40,.85),rgba(0,0,0,.92));opacity:0;visibility:hidden;pointer-events:none;transition:opacity .25s ease;z-index:20;}
   .screen.active{opacity:1;visibility:visible;pointer-events:auto;}
-  .modal-card{width:min(86%,420px);background:linear-gradient(160deg,#1a1530,#0a0a18);border:1px solid rgba(255,255,255,.15);border-radius:18px;padding:24px 22px;text-align:center;box-shadow:0 12px 40px rgba(0,0,0,.6);max-height:88vh;overflow:auto;}
+  .modal-card{width:min(92%,520px);background:linear-gradient(160deg,#1a1530,#0a0a18);border:1px solid rgba(255,255,255,.15);border-radius:18px;padding:22px 20px;text-align:center;box-shadow:0 12px 40px rgba(0,0,0,.6);max-height:90vh;overflow:auto;}
   .modal-title{font-size:22px;font-weight:700;margin-bottom:6px;color:#ffea5e;letter-spacing:2px;}
-  .modal-sub{font-size:13px;color:#aab;margin-bottom:18px;}
-  .modal-msg{font-size:14px;color:#cdd;line-height:1.6;margin-bottom:18px;}
+  .modal-sub{font-size:13px;color:#aab;margin-bottom:14px;}
+  .modal-msg{font-size:14px;color:#cdd;line-height:1.6;margin-bottom:16px;}
   .modal-actions{display:flex;flex-direction:column;gap:10px;}
-  .modal-actions.row{flex-direction:row;}
-  .btn{appearance:none;border:0;cursor:pointer;padding:12px 16px;font-size:15px;font-weight:600;color:#fff;background:linear-gradient(135deg,#6a3df0,#a04dff);border-radius:12px;transition:transform .1s ease,box-shadow .1s ease;letter-spacing:1px;}
+  .modal-actions.row{flex-direction:row;flex-wrap:wrap;}
+  .btn{appearance:none;border:0;cursor:pointer;padding:12px 16px;font-size:15px;font-weight:600;color:#fff;background:linear-gradient(135deg,#6a3df0,#a04dff);border-radius:12px;transition:transform .1s ease,box-shadow .1s ease;letter-spacing:1px;flex:1;min-width:120px;}
   .btn:active{transform:scale(.96);}
   .btn.secondary{background:linear-gradient(135deg,#3b3b50,#56566b);}
   .btn.danger{background:linear-gradient(135deg,#ff4e6e,#ff2e63);}
   .btn.success{background:linear-gradient(135deg,#34c98c,#1aa566);}
 
-  /* 升级卡 */
+  /* 升级 / 宝箱选择卡 */
   .upgrade-list{display:flex;flex-direction:column;gap:10px;margin-top:6px;}
-  .upgrade-card{text-align:left;padding:14px 14px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);border-radius:12px;cursor:pointer;transition:transform .1s ease,background .15s ease,border-color .15s ease;}
+  .upgrade-card{text-align:left;padding:12px 14px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);border-radius:12px;cursor:pointer;transition:transform .1s ease,background .15s ease,border-color .15s ease;}
   .upgrade-card:active{transform:scale(.98);}
   .upgrade-card:hover{border-color:rgba(255,234,94,.6);background:rgba(255,234,94,.05);}
-  .upgrade-card .name{font-size:15px;font-weight:700;color:#ffea5e;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center;}
+  .upgrade-card .name{font-size:15px;font-weight:700;color:#ffea5e;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center;gap:8px;}
   .upgrade-card .name .tag{font-size:11px;color:#9be7ff;background:rgba(30,160,255,.18);border:1px solid rgba(30,160,255,.4);border-radius:8px;padding:2px 6px;font-weight:500;}
-  .upgrade-card .desc{font-size:12px;color:#aab;line-height:1.5;}
+  .upgrade-card .name .lv{font-size:11px;color:#ffea5e;background:rgba(255,234,94,.15);border:1px solid rgba(255,234,94,.4);border-radius:8px;padding:2px 6px;font-weight:500;}
+  .upgrade-card.treasure{border-color:rgba(255,234,94,.4);background:linear-gradient(135deg,rgba(255,234,94,.08),rgba(255,170,68,.08));}
+  .upgrade-card.treasure .name{color:#ff8c42;}
+  .upgrade-card .desc{font-size:12px;color:#aab;line-height:1.5;margin-bottom:8px;}
+  .upgrade-card .branch-row{display:flex;flex-wrap:wrap;gap:8px;}
+  .upgrade-card .branch-btn{flex:1 1 45%;min-width:100px;background:rgba(255,234,94,.08);border:1px solid rgba(255,234,94,.35);border-radius:10px;padding:8px 6px;color:#fff;font-size:12px;cursor:pointer;transition:background .15s,border-color .15s;}
+  .upgrade-card .branch-btn:hover{background:rgba(255,234,94,.18);border-color:rgba(255,234,94,.7);}
+  .upgrade-card .branch-btn small{display:block;color:#aab;font-size:10px;margin-top:2px;}
+  .upgrade-card.has-branches{cursor:default;}
+  .upgrade-card.has-branches:hover{border-color:rgba(255,255,255,.12);background:rgba(255,255,255,.04);}
+  .btn-refresh{background:rgba(75,225,255,.12);border:1px solid rgba(75,225,255,.4);color:#4be1ff;border-radius:10px;padding:8px 16px;font-size:13px;cursor:pointer;transition:background .15s;}
+  .btn-refresh:hover{background:rgba(75,225,255,.22);}
+  .btn-refresh:disabled{opacity:.5;cursor:not-allowed;}
+
+  /* 图鉴 */
+  .codex-tabs{display:flex;gap:8px;margin-bottom:12px;}
+  .codex-tab{flex:1;padding:10px 0;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);border-radius:10px;cursor:pointer;font-size:14px;color:#aab;transition:all .15s ease;}
+  .codex-tab.active{color:#ffea5e;border-color:rgba(255,234,94,.5);background:rgba(255,234,94,.08);}
+  .codex-list{display:flex;flex-direction:column;gap:10px;text-align:left;max-height:55vh;overflow-y:auto;padding-right:4px;}
+  .codex-item{padding:10px 12px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);border-radius:10px;}
+  .codex-item .head{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
+  .codex-item .head .nm{font-size:14px;font-weight:700;color:#ffea5e;}
+  .codex-item .head .badge{font-size:10px;padding:2px 6px;border-radius:6px;background:rgba(155,231,255,.15);color:#9be7ff;border:1px solid rgba(155,231,255,.3);}
+  .codex-item .head .badge.elite{background:rgba(255,234,94,.15);color:#ffea5e;border-color:rgba(255,234,94,.3);}
+  .codex-item .head .badge.boss{background:rgba(255,46,99,.15);color:#ff8aaa;border-color:rgba(255,46,99,.4);}
+  .codex-item .desc{font-size:12px;color:#aab;line-height:1.5;}
+  .codex-item .stats{font-size:11px;color:#9be7ff;margin-top:4px;font-family:monospace;}
+  .sw{width:10px;height:10px;border-radius:50%;display:inline-block;border:1.5px solid #000;box-shadow:0 0 0 1px rgba(255,255,255,.15);}
+
+  /* 暂停-技能 */
+  .skill-section{margin-top:8px;text-align:left;}
+  .skill-section h3{font-size:13px;color:#9be7ff;margin-bottom:6px;letter-spacing:1px;}
+  .skill-row{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;margin-bottom:6px;font-size:13px;}
+  .skill-row .nm{color:#ffea5e;font-weight:600;}
+  .skill-row .lv{color:#9be7ff;font-family:monospace;}
 
   .best-line{font-size:12px;color:#9be7ff;margin-top:10px;}
 
-  .toast{position:absolute;top:60px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.7);color:#ffea5e;padding:8px 16px;border-radius:20px;font-size:13px;z-index:25;opacity:0;transition:opacity .3s ease;pointer-events:none;border:1px solid rgba(255,234,94,.3);}
+  .toast{position:absolute;top:60px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.75);color:#ffea5e;padding:8px 16px;border-radius:20px;font-size:13px;z-index:25;opacity:0;transition:opacity .3s ease;pointer-events:none;border:1px solid rgba(255,234,94,.3);max-width:80%;text-align:center;}
   .toast.show{opacity:1;}
 
   .hint{position:absolute;bottom:24px;right:24px;font-size:12px;color:rgba(255,255,255,.6);background:rgba(0,0,0,.4);padding:6px 10px;border-radius:8px;pointer-events:none;}
+
+  .buff-row{position:absolute;top:80px;left:10px;display:flex;flex-direction:column;gap:4px;pointer-events:none;}
+  .buff-pill{background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.16);border-radius:14px;padding:3px 10px;font-size:11px;color:#ffea5e;backdrop-filter:blur(4px);display:flex;align-items:center;gap:6px;}
+  .buff-pill .dot{width:6px;height:6px;border-radius:50%;background:#ffea5e;}
 </style>
 </head>
 <body>
@@ -80,7 +121,8 @@
         <div class="stat-pill">最佳<span class="v" id="best-stat">0</span></div>
       </div>
       <button class="btn-pause" id="btn-pause" type="button" aria-label="暂停">‖</button>
-      <div class="hint" id="hint">摇杆移动 · 自动攻击</div>
+      <div class="hint" id="hint">摇杆移动 · 自动攻击 · 拾取道具</div>
+      <div class="buff-row" id="buff-row"></div>
     </div>
 
     <div class="joystick" id="joystick" style="display:none;">
@@ -93,11 +135,12 @@
     <div class="screen active" id="screen-start" data-screen="start">
       <div class="modal-card">
         <h1 class="modal-title">暗夜生存者</h1>
-        <p class="modal-sub">无限暗夜 · 生存挑战</p>
-        <p class="modal-msg">操控角色在怪物浪潮中生存更久。<br>击杀怪物可获取经验升级，每次升级可从 3 张强化卡中选择 1 张。<br>挑战 60 秒将迎来 Boss。</p>
-        <div class="modal-actions">
+        <p class="modal-sub">仙侠 × 科幻 · 生存挑战</p>
+        <p class="modal-msg">剑光与激光交织，灵气与数据共鸣。<br>在冥界行尸、虚空影蝠、钢铁傀儡的围攻下生存更久，击败首领开启天罡秘宝。</p>
+        <div class="modal-actions row">
           <button class="btn" type="button" data-action="start">开始挑战</button>
-          <button class="btn secondary" type="button" data-action="show-how">玩法说明</button>
+          <button class="btn secondary" type="button" data-action="show-codex">图鉴</button>
+          <button class="btn secondary" type="button" data-action="show-how">玩法</button>
         </div>
         <div class="best-line" id="start-best">最佳生存：--  ·  最高分：--</div>
       </div>
@@ -109,25 +152,60 @@
         <h2 class="modal-title">玩法说明</h2>
         <p class="modal-msg">
           · 左下角摇杆控制角色移动<br>
-          · 角色会自动攻击最近的敌人<br>
-          · 击败怪物掉落绿色经验宝石<br>
-          · 升级时从 3 张卡中选 1 张强化<br>
-          · 60 秒时会出现强力 Boss<br>
-          · 生命归零即挑战失败
+          · 角色自动对最近敌人释放剑气<br>
+          · 击杀怪物获得经验并可拾取道具<br>
+          · <b style="color:#ffea5e">精英怪</b>体型更大、掉落更多；<b style="color:#ff8aaa">首领</b>60 秒出现一次<br>
+          · <b style="color:#ff8c42">首领宝箱</b>可获得稀有强化<br>
+          · 升级时从 3 张强化卡中选 1 张<br>
+          · 暂停界面可查看当前技能等级
         </p>
-        <div class="modal-actions">
+        <div class="modal-actions row">
           <button class="btn" type="button" data-action="start">开始挑战</button>
           <button class="btn secondary" type="button" data-action="back-start">返回</button>
         </div>
       </div>
     </div>
 
+    <!-- 图鉴 -->
+    <div class="screen" id="screen-codex" data-screen="codex">
+      <div class="modal-card">
+        <h2 class="modal-title">图鉴</h2>
+        <div class="codex-tabs">
+          <div class="codex-tab active" data-tab="skill">技能图鉴</div>
+          <div class="codex-tab" data-tab="monster">怪物图鉴</div>
+          <div class="codex-tab" data-tab="item">道具图鉴</div>
+        </div>
+        <div class="codex-list" id="codex-list"></div>
+        <div class="modal-actions" style="margin-top:14px;">
+          <button class="btn secondary" type="button" data-action="back-start">返回</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 开局武器选择 -->
+    <div class="screen" id="screen-weapon" data-screen="weapon">
+      <div class="modal-card">
+        <h2 class="modal-title">选择初始武器</h2>
+        <p class="modal-sub">角色初始没有任何技能，请选择一项武器开始挑战</p>
+        <div class="upgrade-list" id="weapon-select-list"></div>
+      </div>
+    </div>
+
     <!-- 升级选择 -->
     <div class="screen" id="screen-levelup" data-screen="levelup">
       <div class="modal-card">
-        <h2 class="modal-title">升级！</h2>
-        <p class="modal-sub">选择一项强化</p>
+        <h2 class="modal-title">突破境界</h2>
+        <p class="modal-sub">从下列强化中选择一项</p>
         <div class="upgrade-list" id="upgrade-list"></div>
+      </div>
+    </div>
+
+    <!-- 首领宝箱 -->
+    <div class="screen" id="screen-treasure" data-screen="treasure">
+      <div class="modal-card">
+        <h2 class="modal-title">天罡秘宝</h2>
+        <p class="modal-sub">首领精华凝聚 · 4 选 1</p>
+        <div class="upgrade-list" id="treasure-list"></div>
       </div>
     </div>
 
@@ -135,8 +213,16 @@
     <div class="screen" id="screen-pause" data-screen="pause">
       <div class="modal-card">
         <h2 class="modal-title">已暂停</h2>
-        <p class="modal-msg">休息一下，怪物会等你。</p>
-        <div class="modal-actions">
+        <p class="modal-msg">当前已领悟的功法与武器：</p>
+        <div class="skill-section">
+          <h3>已习功法</h3>
+          <div id="skill-panel"></div>
+        </div>
+        <div class="skill-section">
+          <h3>武器装备</h3>
+          <div id="weapon-panel"></div>
+        </div>
+        <div class="modal-actions" style="margin-top:14px;">
           <button class="btn" type="button" data-action="resume">继续挑战</button>
           <button class="btn danger" type="button" data-action="quit">结束本次</button>
         </div>
@@ -148,7 +234,7 @@
       <div class="modal-card">
         <h2 class="modal-title">挑战结束</h2>
         <p class="modal-msg" id="over-msg">本次生存 0 秒，击败 0 个敌人。</p>
-        <div class="modal-actions">
+        <div class="modal-actions row">
           <button class="btn" type="button" data-action="restart">再来一次</button>
           <button class="btn secondary" type="button" data-action="back-start">返回首页</button>
         </div>
@@ -161,46 +247,146 @@
 <script>
 'use strict';
 (function(){
+  // ================== 怪物图鉴数据 ==================
+  const MONSTERS = [
+    { id:'walking_dead', name:'冥界行尸', tag:'仙侠', badge:'', level:1, color:'#7ed957', desc:'被幽冥之气浸染的尸体，移动缓慢但数量众多。', hp:24, dmg:5, speed:0.7, xp:1, theme:'xianxia' },
+    { id:'shadow_bat',   name:'虚空影蝠', tag:'科幻', badge:'', level:1, color:'#ff6b9d', desc:'来自数据虚空的暗影生物，速度极快，接近玩家会停顿后直线冲刺。', hp:18,  dmg:12, speed:1.7, xp:1, theme:'scifi' },
+    { id:'ghost_warrior',name:'幽魂剑卫', tag:'仙侠', badge:'', level:2, color:'#a8e0ff', desc:'身披残破战甲的游魂剑客，中等实力。',         hp:42, dmg:7, speed:1.0, xp:2, theme:'xianxia' },
+    { id:'iron_puppet',  name:'钢铁傀儡', tag:'科幻', badge:'', level:2, color:'#ffb86c', desc:'上古文明遗留的机械战偶，皮糙肉厚。',         hp:75, dmg:9, speed:0.6, xp:3, theme:'scifi' },
+    { id:'poison_spider',name:'毒蛊妖蛛', tag:'仙侠', badge:'', level:2, color:'#7ed9d9', desc:'潜伏在幽冥裂隙中的剧毒妖蛛，行动迅捷。',     hp:33, dmg:6, speed:1.1, xp:2, theme:'xianxia' },
+    { id:'flame_demon',  name:'赤焰魔修', tag:'仙侠', badge:'', level:3, color:'#ff6b6b', desc:'堕入魔道的修士，周身环绕赤焰火罡。',         hp:57, dmg:8, speed:0.9, xp:3, theme:'xianxia' },
+    { id:'mech_hound',   name:'机械猎犬', tag:'科幻', badge:'', level:2, color:'#50c8ff', desc:'上古文明培育的机械兽，接近玩家会停顿后直线冲刺。', hp:30, dmg:13, speed:1.5, xp:2, theme:'scifi' },
+    { id:'plasma_ghost', name:'等离子幽灵', tag:'科幻', badge:'', level:3, color:'#b478ff', desc:'高维能量体在数据虚空的投影，可穿透实体。',   hp:48, dmg:7, speed:1.2, xp:3, theme:'scifi' },
+    { id:'bomb_ghoul',   name:'腐爆尸傀', tag:'仙侠', badge:'', level:2, color:'#ff8c42', desc:'被邪术炼制的自爆尸傀，接近玩家时加速冲锋并引爆自身。',   hp:21, dmg:28, speed:0.9, xp:2, theme:'xianxia' },
+    { id:'overload_bot', name:'过载机兵', tag:'科幻', badge:'', level:2, color:'#ff5e7e', desc:'核心不稳定的机械兵，接近玩家时加速冲锋并过载爆炸。',   hp:18, dmg:32, speed:1.0, xp:2, theme:'scifi' },
+    { id:'elite_ghost',  name:'幽冥剑主', tag:'仙侠', badge:'elite', level:4, color:'#ffea5e', desc:'幽魂剑卫中的精英，泛着金光，必掉高级道具。', hp:156, dmg:18, speed:0.9, xp:10, theme:'xianxia' },
+    { id:'elite_mech',   name:'破晓机甲', tag:'科幻', badge:'elite', level:4, color:'#ffea5e', desc:'钢铁傀儡中的精英，核能核心闪烁金光。',       hp:234, dmg:22, speed:0.55, xp:12, theme:'scifi' },
+    { id:'elite_archer', name:'幽冥箭修', tag:'仙侠', badge:'elite', level:4, color:'#ffea5e', desc:'精英中的远程单位，可射出幽冥剑气。',         hp:117, dmg:8, speed:0.7, xp:12, theme:'xianxia' },
+    { id:'elite_sniper', name:'脉冲狙击手', tag:'科幻', badge:'elite', level:4, color:'#ffea5e', desc:'装备了高斯步枪的精英机械单位，射程极远。',   hp:143, dmg:10, speed:0.6, xp:14, theme:'scifi' },
+    { id:'boss_demon',   name:'妖王·噬天', tag:'仙侠', badge:'boss',  level:5, color:'#ff2e63', desc:'冥界之主，操控幽冥剑气，每三分钟出现一次。',   hp:770, dmg:24, speed:0.5, xp:35, theme:'xianxia' },
+    { id:'boss_mech',    name:'机皇·天启', tag:'科幻', badge:'boss',  level:5, color:'#ff5e7e', desc:'远古文明终极兵器，激光与剑气交织。',         hp:1100, dmg:30, speed:0.45, xp:40, theme:'scifi' },
+  ];
+  const MONSTER_BY_ID = {};
+  MONSTERS.forEach(m => MONSTER_BY_ID[m.id] = m);
+
+  // ================== 技能/升级数据 ==================
+  const SKILLS = [
+    { id:'dmg',  name:'诛邪剑气', tag:'新武器', max:1, baseDmg:14,
+      desc:'解锁诛邪剑气：发射直线剑气攻击敌人',
+      onFirst:(p)=>{ p.bulletCount = Math.max(p.bulletCount, 1); }
+    },
+    { id:'dmg_count', name:'剑气·分化', tag:'弹幕', max:5, per:1, req:['dmg'],
+      desc:'子弹数量 +1（最多 7）', apply:(p)=>{ p.bulletCount = Math.min(7, p.bulletCount+1); } },
+    { id:'dmg_range', name:'剑气·纵横', tag:'伤害', max:5, req:['dmg'],
+      desc:'射程 +40%，伤害 +15%', apply:(p)=>{ p.bulletRange *= 1.4; p.bulletDmg *= 1.15; } },
+    { id:'dmg_power', name:'剑气·贯虹', tag:'伤害', max:5, req:['dmg'],
+      desc:'射程 +15%，伤害 +40%', apply:(p)=>{ p.bulletRange *= 1.15; p.bulletDmg *= 1.4; } },
+    { id:'rate', name:'神速诀',   tag:'攻速', max:5, per:0.15, desc:'攻击速度 +15% / 级' },
+    { id:'spd',  name:'御风术',   tag:'移速', max:4, per:0.12, desc:'移动速度 +12% / 级' },
+    { id:'hp',   name:'金刚体',   tag:'生存', max:5, per:25,   desc:'最大生命 +25 / 级，并回满' },
+    { id:'regen',name:'养生功',   tag:'生存', max:5, per:1,    desc:'每秒回复 +1 生命 / 级' },
+    { id:'xp',   name:'灵识诀',   tag:'成长', max:4, per:0.25, desc:'经验获取 +25% / 级' },
+    { id:'gather', name:'聚气决', tag:'成长', max:5, per:0.15, desc:'拾取范围 +15% / 级', apply:(p)=>{ p.pickupRange *= 1.15; } },
+    { id:'aura', name:'剑气领域', tag:'新武器', max:1, baseDmg:8,
+      desc:'解锁剑气领域：持续伤害周围敌人',
+      onFirst:(p)=>{ p.auraDmg = Math.max(p.auraDmg, 8); p.auraRadius = Math.max(p.auraRadius, 90); }
+    },
+    { id:'aura_range', name:'领域·扩张', tag:'新武器', max:5, req:['aura'],
+      desc:'范围 +50%，伤害 +20%', apply:(p)=>{ p.auraRadius *= 1.5; p.auraDmg *= 1.2; } },
+    { id:'aura_power', name:'领域·凝聚', tag:'新武器', max:5, req:['aura'],
+      desc:'范围 +20%，伤害 +50%', apply:(p)=>{ p.auraRadius *= 1.2; p.auraDmg *= 1.5; } },
+    { id:'laser', name:'激光枪', tag:'新武器', max:1, baseDmg:28,
+      desc:'解锁激光枪：每 2 秒发射一道穿透激光',
+      onFirst:(p)=>{ p.laserDmg = Math.max(p.laserDmg, 28); p.laserRange = Math.max(p.laserRange, 650); p.laserCount = Math.max(p.laserCount, 1); p.laserInterval = Math.max(p.laserInterval, 2.0); }
+    },
+    { id:'laser_count', name:'激光·分束', tag:'弹幕', max:5, req:['laser'],
+      desc:'激光数量 +1（最多 3）', apply:(p)=>{ p.laserCount = Math.min(3, p.laserCount+1); } },
+    { id:'laser_range', name:'激光·延伸', tag:'伤害', max:5, req:['laser'],
+      desc:'激光大小 +40%，伤害 +15%', apply:(p)=>{ p.laserWidthMult *= 1.4; p.laserDmg *= 1.15; } },
+    { id:'laser_power', name:'激光·聚能', tag:'伤害', max:5, req:['laser'],
+      desc:'激光大小 +15%，伤害 +40%', apply:(p)=>{ p.laserWidthMult *= 1.15; p.laserDmg *= 1.4; } },
+  ];
+  const SKILL_BY_ID = {};
+  SKILLS.forEach(s => SKILL_BY_ID[s.id] = s);
+
+  // ================== 道具数据 ==================
+  // rarity: common / rare / epic；权重越低越稀有，掉落概率越低
+  const ITEMS = [
+    { id:'heal',    name:'回春丹',     color:'#7ed957', symbol:'✚', rarity:'common', desc:'恢复 35 生命', effect:(p)=>{ p.hp = Math.min(p.maxHp, p.hp+35); showToast('使用回春丹 +35',800); } },
+    { id:'shield',  name:'金身符',     color:'#4be1ff', symbol:'◈', rarity:'rare',   desc:'5 秒内免疫伤害', effect:(p)=>{ p.iframes = Math.max(p.iframes, 5); showToast('金身符：5 秒无敌',800); } },
+    { id:'xp',      name:'聚灵符',     color:'#b478ff', symbol:'✦', rarity:'common', desc:'立即获得 25 经验', effect:(p)=>{ p.xp += 25; showToast('聚灵符 +25 经验',800); if (p.xp >= p.xpNext) levelUp(); } },
+    { id:'power',   name:'天罡符',     color:'#ff8c42', symbol:'⚡', rarity:'epic',   desc:'10 秒内伤害 +50%', effect:(p)=>{ p.powerUpTime = Math.max(p.powerUpTime||0, 10); showToast('天罡符：伤害 +50%',800); } },
+  ];
+  const ITEM_BY_ID = {};
+  ITEMS.forEach(i => ITEM_BY_ID[i.id] = i);
+
+  // ================== 首领宝箱 ==================
+  const TREASURES = [
+    { name:'诛仙剑阵', desc:'子弹 +2，伤害 +50%', apply:(p)=>{ p.bulletCount = Math.min(7, p.bulletCount+2); p.dmgMult *= 1.5; } },
+    { name:'御剑术',   desc:'子弹速度 ×2，射程 +50%', apply:(p)=>{ p.bulletSpeed *= 2; p.bulletRange *= 1.5; } },
+    { name:'雷火护体', desc:'光环伤害翻倍，范围 +30%', apply:(p)=>{ p.auraDmg = Math.max(p.auraDmg, 12) * 2; p.auraRadius *= 1.3; } },
+    { name:'时光秘术', desc:'攻速 +50%，移速 +30%',  apply:(p)=>{ p.fireInterval *= 0.5; p.laserInterval *= 0.5; p.speedMult *= 1.3; } },
+    { name:'太乙真气', desc:'生命上限 +100 并回满，回复 +3/秒', apply:(p)=>{ p.maxHp += 100; p.hp = p.maxHp; p.regen += 3; } },
+  ];
+
   // ================== 常量 ==================
-  const STORAGE_KEY = 'darknight_survivor_save_v1';
-  const WORLD_PADDING = 80;          // 玩家活动区域相对屏幕的扩展
+  const STORAGE_KEY = 'darknight_survivor_save_v2';
   const PLAYER_BASE = {
     hp: 100, maxHp: 100,
     speed: 2.4,
     size: 14,
     iframes: 0,
     fireCd: 0,
-    fireInterval: 0.55,                // 秒/次
+    fireInterval: 0.6,
     bulletDmg: 14,
-    bulletSpeed: 6,
-    bulletRange: 320,
-    bulletCount: 1,
-    pickupRange: 90,
-    auraDmg: 0,                        // 0 表示未解锁
+    bulletSpeed: 7,
+    bulletRange: 520,
+    bulletCount: 0,
+    pickupRange: 100,
+    auraDmg: 0,
     auraRadius: 0,
     auraCd: 0,
     auraInterval: 0.8,
+    laserDmg: 0,
+    laserRange: 0,
+    laserCount: 0,
+    laserInterval: 2.0,
+    laserWidthMult: 1,
+    laserCd: 0,
     xpMult: 1,
     dmgMult: 1,
     speedMult: 1,
-    regen: 0,                          // 每秒回血
+    regen: 0,
+    powerUpTime: 0,
+    skills: {},   // 技能等级记录
   };
-  const ENEMY_TYPES = {
-    zombie: { hp: 22, speed: 0.9, size: 14, dmg: 8, xp: 1, color: '#7ed957', score: 5, spawnWeight: 5 },
-    bat:    { hp: 10, speed: 2.0, size: 10, dmg: 5, xp: 1, color: '#ff6b9d', score: 6, spawnWeight: 4 },
-    brute:  { hp: 80, speed: 0.7, size: 20, dmg: 14, xp: 4, color: '#ff8c42', score: 18, spawnWeight: 1 },
-    boss:   { hp: 600, speed: 0.6, size: 36, dmg: 22, xp: 30, color: '#ff2e63', score: 200, spawnWeight: 0 },
+  // 怪物生成配置（直接对应图鉴中的 id）
+  const ENEMY_SPAWN = {
+    walking_dead: { level:1, hp:1.5, dmg:1.0, attackType:'melee', weight:6, xp:1, score:5, color:'#7ed957', size:14, speed: 0.7, theme:'xianxia' },
+    shadow_bat:   { level:1, hp:2.25, dmg:3.0, attackType:'dash', weight:5, xp:1, score:6, color:'#ff6b9d', size:10, speed: 1.7, theme:'scifi' },
+    ghost_warrior:{ level:2, hp:1.5, dmg:1.0, attackType:'melee', weight:2, xp:2, score:10,color:'#a8e0ff', size:16, speed: 1.0, theme:'xianxia' },
+    iron_puppet:  { level:2, hp:1.5, dmg:1.0, attackType:'melee', weight:1, xp:3, score:15,color:'#ffb86c', size:20, speed: 0.6, theme:'scifi' },
+    poison_spider:{ level:2, hp:1.5, dmg:1.0, attackType:'melee', weight:3, xp:2, score:8, color:'#7ed9d9', size:13, speed: 1.1, theme:'xianxia' },
+    flame_demon:  { level:3, hp:1.5, dmg:1.0, attackType:'melee', weight:2, xp:3, score:18,color:'#ff6b6b', size:18, speed: 0.9, theme:'xianxia' },
+    mech_hound:   { level:2, hp:1.67, dmg:2.6, attackType:'dash', weight:4, xp:2, score:9, color:'#50c8ff', size:12, speed: 1.5, theme:'scifi' },
+    plasma_ghost: { level:3, hp:1.5, dmg:1.0, attackType:'melee', weight:2, xp:3, score:20,color:'#b478ff', size:15, speed: 1.2, theme:'scifi' },
+    bomb_ghoul:   { level:2, hp:1.2, dmg:28, attackType:'suicide', weight:2, xp:2, score:12,color:'#ff8c42', size:15, speed: 0.9, theme:'xianxia' },
+    overload_bot: { level:2, hp:1.05, dmg:32, attackType:'suicide', weight:2, xp:2, score:12,color:'#ff5e7e', size:14, speed: 1.0, theme:'scifi' },
   };
-  const UPGRADES = [
-    { id:'dmg',  name:'攻击强化',   tag:'伤害', desc:'所有武器伤害 +20%', apply:(p)=>{ p.dmgMult *= 1.2; } },
-    { id:'rate', name:'极速射击',   tag:'攻速', desc:'攻击速度 +15%',     apply:(p)=>{ p.fireInterval *= 0.85; p.auraInterval *= 0.85; } },
-    { id:'spd',  name:'疾风步',     tag:'移速', desc:'移动速度 +12%',     apply:(p)=>{ p.speedMult *= 1.12; } },
-    { id:'hp',   name:'生命上限',   tag:'生存', desc:'最大生命 +25 并回满', apply:(p)=>{ p.maxHp += 25; p.hp = p.maxHp; } },
-    { id:'regen',name:'回复',       tag:'生存', desc:'每秒回复 1 点生命', apply:(p)=>{ p.regen += 1; } },
-    { id:'mult', name:'多重射击',   tag:'弹幕', desc:'子弹数量 +1（最多 6）', apply:(p)=>{ p.bulletCount = Math.min(6, p.bulletCount + 1); } },
-    { id:'xp',   name:'经验加成',   tag:'成长', desc:'经验获取 +25%',     apply:(p)=>{ p.xpMult *= 1.25; } },
-    { id:'aura', name:'灼热光环',   tag:'新武器', desc:'解锁灼热光环，对附近敌人每秒造成 8 点伤害', apply:(p)=>{ p.auraDmg = 8; p.auraRadius = 90; }, once:true },
-  ];
+  const ELITE_SPAWN = {
+    elite_ghost:  { level:4, hpBase:156, dmg:18, attackType:'melee', weight:2, xp:10, score:45, color:'#ffea5e', size:18, speed: 0.9, theme:'xianxia' },
+    elite_mech:   { level:4, hpBase:234, dmg:22, attackType:'melee', weight:2, xp:12, score:50, color:'#ffea5e', size:24, speed: 0.55, theme:'scifi' },
+    elite_archer: { level:4, hpBase:117,  dmg:8,  attackType:'ranged', weight:1, xp:12, score:45, color:'#ffea5e', size:16, speed: 0.7, theme:'xianxia',
+                    projectile:{ color:'#ffea5e', speed:5, range:350, dmg:8, size:4, cd:2.0 } },
+    elite_sniper: { level:4, hpBase:143, dmg:10, attackType:'ranged', weight:1, xp:14, score:55, color:'#ffea5e', size:17, speed: 0.6, theme:'scifi',
+                    projectile:{ color:'#4be1ff', speed:6, range:400, dmg:10, size:4, cd:2.5 } },
+  };
+  const BOSS_SPAWN = {
+    boss_demon: { level:5, hpBase:770, dmg:24, attackType:'melee', weight:1, xp:35, score:250, color:'#ff2e63', size:36, speed: 0.5,  theme:'xianxia',
+                  projectile:{ color:'#ff2e63', speed:5, range:450, dmg:15, size:6, cd:2.5 } },
+    boss_mech:  { level:5, hpBase:1100,dmg:30, attackType:'melee', weight:1, xp:40, score:300, color:'#ff5e7e', size:38, speed: 0.45, theme:'scifi',
+                  projectile:{ color:'#ff5e7e', speed:6, range:500, dmg:18, size:6, cd:2.0 } },
+  };
 
   // ================== DOM ==================
   const stage = document.getElementById('stage');
@@ -219,20 +405,42 @@
   const bestStat = document.getElementById('best-stat');
   const btnPause = document.getElementById('btn-pause');
   const upgradeListEl = document.getElementById('upgrade-list');
+  const treasureListEl = document.getElementById('treasure-list');
+  const skillPanel = document.getElementById('skill-panel');
+  const weaponPanel = document.getElementById('weapon-panel');
   const overMsg = document.getElementById('over-msg');
   const overBest = document.getElementById('over-best');
   const startBest = document.getElementById('start-best');
+  const codexList = document.getElementById('codex-list');
   const toast = document.getElementById('toast');
   const hint = document.getElementById('hint');
+  const buffRow = document.getElementById('buff-row');
 
   // ================== 工具 ==================
   const rand = (a,b)=>a+Math.random()*(b-a);
   const randInt = (a,b)=>Math.floor(rand(a,b+1));
   const pick = (arr)=>arr[Math.floor(Math.random()*arr.length)];
+  function pickWeighted(obj){
+    const pool = [];
+    Object.keys(obj).forEach(id=>{
+      const t = obj[id];
+      const w = Math.max(0, Math.floor(t.weight || 1));
+      for (let i=0;i<w;i++) pool.push(id);
+    });
+    return pick(pool);
+  }
   const clamp = (v,a,b)=>v<a?a:v>b?b:v;
   const dist2 = (ax,ay,bx,by)=>{ const dx=ax-bx, dy=ay-by; return dx*dx+dy*dy; };
   const len = (x,y)=>Math.sqrt(x*x+y*y);
   const norm = (x,y)=>{ const l=len(x,y)||1; return [x/l,y/l]; };
+  function distToSegment(px, py, ax, ay, bx, by){
+    const dx = bx-ax, dy = by-ay;
+    const len2 = dx*dx + dy*dy;
+    if (len2 === 0) return Math.sqrt((px-ax)*(px-ax)+(py-ay)*(py-ay));
+    let t = Math.max(0, Math.min(1, ((px-ax)*dx + (py-ay)*dy) / len2));
+    const projx = ax + t*dx, projy = ay + t*dy;
+    return Math.sqrt((px-projx)*(px-projx)+(py-projy)*(py-projy));
+  }
   const fmtTime = (s)=>{ s=Math.max(0,Math.floor(s)); const m=Math.floor(s/60), r=s%60; return (m<10?'0':'')+m+':'+(r<10?'0':'')+r; };
 
   function showToast(text, ms=1200){
@@ -268,29 +476,64 @@
     try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }catch(e){}
   }
 
+  // ================== 升级实际效果 ==================
+  function applySkill(skillId){
+    const p = G.player; if (!p) return;
+    const sk = SKILL_BY_ID[skillId];
+    const cur = p.skills[skillId] || 0;
+    if (cur >= sk.max) return; // 已达上限不再升级
+
+    // 首次学习某些技能时先解锁基础效果
+    if (cur === 0 && sk.onFirst) sk.onFirst(p);
+
+    // 自定义 apply 的技能（分支、聚气决等）
+    if (sk.apply){
+      sk.apply(p);
+    }
+    // 传统百分比技能
+    else {
+      switch(skillId){
+        case 'rate': p.fireInterval *= 1 - sk.per; p.auraInterval *= 1 - sk.per; p.laserInterval *= 1 - sk.per; break;
+        case 'spd':  p.speedMult *= 1 + sk.per; break;
+        case 'hp':   p.maxHp += sk.per; p.hp = p.maxHp; break;
+        case 'regen':p.regen += sk.per; break;
+        case 'xp':   p.xpMult *= 1 + sk.per; break;
+      }
+    }
+
+    p.skills[skillId] = cur + 1;
+  }
+
   // ================== 游戏状态 ==================
   const G = {
-    state: 'menu',         // menu, playing, paused, levelup, over
+    state: 'menu',
     time: 0,
     realTime: 0,
     score: 0,
     kills: 0,
     spawnTimer: 0,
-    spawnInterval: 1.6,
-    bossSpawned: false,
+    eliteTimer: 0,
+    bossTimer: 0,
+    nextBossAt: 180,       // 第一次首领 3 分钟后
+    bossInterval: 180,     // 之后每 3 分钟一只
     shake: 0,
-    world: { w: 0, h: 0 },   // 像素，世界尺寸
-    camera: { x: 0, y: 0, scale: 1 },
-    view: { w: 0, h: 0 },    // 视口像素
+    world: { w: 0, h: 0 },
+    camera: { x: 0, y: 0 },
+    view: { w: 0, h: 0 },
     dpr: 1,
     player: null,
     enemies: [],
     bullets: [],
+    enemyBullets: [],
+    lasers: [],
     pickups: [],
+    items: [],         // 道具实体
+    treasures: [],     // 宝箱实体
     particles: [],
     damageNums: [],
-    input: { ax: 0, ay: 0, active: false },
+    input: { ax: 0, ay: 0 },
     lastTs: 0,
+    pause: false,
   };
 
   // ================== 实体工厂 ==================
@@ -298,34 +541,65 @@
     const p = Object.assign({}, PLAYER_BASE);
     p.x = x; p.y = y;
     p.level = 1; p.xp = 0; p.xpNext = 5;
-    p.facing = 0;
-    p.trail = 0;
+    p.facing = 0; p.trail = 0;
+    p.skills = {};
     return p;
   }
-  function makeEnemy(type, x, y, hpScale=1, dmgScale=1){
-    const t = ENEMY_TYPES[type];
+  function makeEnemy(id, x, y, hpScale=1, dmgScale=1){
+    let t, isElite=false, isBoss=false;
+    if (ENEMY_SPAWN[id]) t = ENEMY_SPAWN[id];
+    else if (ELITE_SPAWN[id]){ t = ELITE_SPAWN[id]; isElite=true; }
+    else if (BOSS_SPAWN[id]){ t = BOSS_SPAWN[id]; isBoss=true; }
+    if (!t) return null;
+    const baseHp = isBoss || isElite ? (t.hpBase || 1) : (t.hp || 1);
+    const finalHp = Math.max(1, baseHp * hpScale);
     return {
-      type, x, y,
+      id, x, y,
       vx: 0, vy: 0,
-      hp: t.hp * hpScale,
-      maxHp: t.hp * hpScale,
+      level: t.level || 1,
+      hp: finalHp,
+      maxHp: finalHp,
+      dmg: t.dmg * dmgScale,
       speed: t.speed,
       size: t.size,
-      dmg: t.dmg * dmgScale,
       xp: t.xp,
       score: t.score,
       color: t.color,
+      theme: t.theme,
+      isElite, isBoss,
+      attackType: t.attackType || 'melee',
+      projectile: t.projectile || null,
+      rangedCd: t.projectile ? (t.projectile.cd || 2) : 0,
+      explodeTimer: -1,
       knock: 0, knockX: 0, knockY: 0,
       flash: 0,
-      isBoss: type === 'boss',
-      attackCd: rand(0.5, 1.2),
+      // 基础攻击冷却（spawnOneEnemy 等会再覆盖为更大值）
+      attackCd: 1.2,
+      auraPhase: 0,
+      // 冲刺型 AI 状态：0=行走 1=停顿蓄力 2=直线冲刺 3=冲刺后冷却
+      dashState: 0,
+      dashTimer: 0,
+      dashDx: 0, dashDy: 0,
+      dashCd: 1.5, // 出生后第一次冲刺前的冷却
     };
   }
   function makeBullet(x,y,dx,dy,dmg,speed,range){
     return { x, y, dx, dy, dmg, speed, dist:0, range, life:1.6, color:'#ffe45e' };
   }
+  function makeLaser(x,y,dx,dy,dmg,range,width){
+    return { x, y, dx, dy, dmg, range, width, dist:0, life:0.28, maxLife:0.28, color:'#ff2e63' };
+  }
+  function makeEnemyBullet(x,y,dx,dy,dmg,speed,range,color,size){
+    return { x, y, dx, dy, dmg, speed, dist:0, range, life:2.0, color, size:size||4 };
+  }
   function makePickup(x,y,xp){
-    return { x, y, xp, size:5, vy:0, life: 12, magnet:0 };
+    return { x, y, xp, size:5, vy:0, life: 12 };
+  }
+  function makeItem(id, x, y){
+    return { id, x, y, life: 30, bob: rand(0, Math.PI*2) };
+  }
+  function makeTreasure(x, y){
+    return { x, y, life: 60, bob: 0 };
   }
   function makeParticle(x,y,color,life=0.4,size=3,dx=0,dy=0){
     return { x, y, color, life, max:life, size, dx, dy };
@@ -344,8 +618,8 @@
     canvas.style.width = r.width + 'px';
     canvas.style.height = r.height + 'px';
     ctx.setTransform(G.dpr, 0, 0, G.dpr, 0, 0);
-    G.world.w = r.width * 2;
-    G.world.h = r.height * 2;
+    G.world.w = r.width * 2.2;
+    G.world.h = r.height * 2.2;
     if (G.player){
       G.player.x = clamp(G.player.x, 20, G.world.w - 20);
       G.player.y = clamp(G.player.y, 20, G.world.h - 20);
@@ -353,8 +627,11 @@
   }
   function updateCamera(){
     if(!G.player) return;
-    G.camera.x = G.player.x - G.view.w/2;
-    G.camera.y = G.player.y - G.view.h/2;
+    // 相机跟随玩家，并 clamp 到世界范围内（避免在世界角落时相机为负）
+    const cx = G.player.x - G.view.w/2;
+    const cy = G.player.y - G.view.h/2;
+    G.camera.x = clamp(cx, 0, Math.max(0, G.world.w - G.view.w));
+    G.camera.y = clamp(cy, 0, Math.max(0, G.world.h - G.view.h));
   }
 
   // ================== 输入（摇杆） ==================
@@ -376,7 +653,7 @@
     e.preventDefault();
     if (G.state !== 'playing') return;
     joyId = e.pointerId;
-    joystick.setPointerCapture(joyId);
+    try{ joystick.setPointerCapture(joyId); }catch(_){}
     joyRect = joystick.getBoundingClientRect();
     setKnob(0, 0);
   });
@@ -397,7 +674,7 @@
   joystick.addEventListener('pointercancel', endJoy);
   joystick.addEventListener('pointerleave', endJoy);
 
-  // 键盘辅助（桌面调试）
+  // 键盘辅助
   const keys = {};
   window.addEventListener('keydown', e=>{
     keys[e.key.toLowerCase()] = true;
@@ -419,49 +696,509 @@
     if (!t) return;
     const a = t.getAttribute('data-action');
     switch(a){
-      case 'start': startGame(); break;
+      case 'start':
+      case 'restart': showWeaponSelect(); break;
       case 'show-how': showScreen('screen-how'); break;
+      case 'show-codex': openCodex('skill'); break;
       case 'back-start': showScreen('screen-start'); break;
       case 'resume': resumeGame(); break;
       case 'quit': endGame(true); break;
-      case 'restart': startGame(); break;
     }
   });
+  // 图鉴 tab 切换
+  document.querySelectorAll('.codex-tab').forEach(tab=>{
+    tab.addEventListener('click', ()=>{
+      document.querySelectorAll('.codex-tab').forEach(x=>x.classList.remove('active'));
+      tab.classList.add('active');
+      renderCodex(tab.getAttribute('data-tab'));
+    });
+  });
 
-  // ================== 游戏流程 ==================
+  // ================== 难度曲线（更平缓） ==================
+  function difficulty(){
+    const t = G.time;
+    // 数量：0~30s 极少，30~60 缓和上升，60 后逐步加压
+    if (t < 15) return { count:[0,1], interval:2.4, hpScale:0.7, dmgScale:0.7, eliteEvery: 18 };
+    if (t < 30) return { count:[1,1], interval:2.0, hpScale:0.85, dmgScale:0.8, eliteEvery: 15 };
+    if (t < 60) return { count:[1,2], interval:1.6, hpScale:1.0,  dmgScale:0.95, eliteEvery: 12 };
+    if (t < 120) return { count:[2,4], interval:1.2, hpScale:1.0 + (t-60)*0.012, dmgScale:1.0 + (t-60)*0.006, eliteEvery: 10 };
+    return { count:[4,7], interval:0.85, hpScale:1.72 + (t-120)*0.018, dmgScale:1.36 + (t-120)*0.006, eliteEvery: 8 };
+  }
+
+  // ================== 敌人刷新 ==================
+  function spawnEnemies(dt){
+    if (G.state !== 'playing') return;
+    const d = difficulty();
+    G.spawnTimer -= dt;
+    if (G.spawnTimer <= 0){
+      G.spawnTimer = d.interval;
+      const n = randInt(d.count[0], d.count[1]);
+      for (let i=0;i<n;i++) spawnOneEnemy(d);
+    }
+    // 精英
+    G.eliteTimer -= dt;
+    if (G.eliteTimer <= 0){
+      G.eliteTimer = d.eliteEvery;
+      spawnOneElite(d);
+    }
+    // 首领
+    if (G.time >= G.nextBossAt){
+      G.nextBossAt += G.bossInterval;
+      spawnOneBoss();
+      showToast('⚠ 首领降临！', 1600);
+    }
+  }
+  function spawnOneEnemy(d){
+    // 从视口边缘外 80 像素的随机位置生成（避免在世界角落时 clamp 后跑到玩家身边）
+    const w = G.view.w, h = G.view.h;
+    const camX = G.camera.x, camY = G.camera.y;
+    const margin = 80;
+    let x, y;
+    for (let tries=0; tries<6; tries++){
+      const side = Math.floor(Math.random() * 4);
+      if (side === 0){ // top
+        x = camX + Math.random() * w;
+        y = camY - margin;
+      } else if (side === 1){ // bottom
+        x = camX + Math.random() * w;
+        y = camY + h + margin;
+      } else if (side === 2){ // left
+        x = camX - margin;
+        y = camY + Math.random() * h;
+      } else { // right
+        x = camX + w + margin;
+        y = camY + Math.random() * h;
+      }
+      x = clamp(x, 6, G.world.w - 6);
+      y = clamp(y, 6, G.world.h - 6);
+      // 必须离玩家足够远（至少 280 像素），保证玩家有反应时间
+      if (dist2(x, y, G.player.x, G.player.y) >= 280 * 280) break;
+    }
+    // 早期只生成慢速的冥界行尸，避免快速怪偷袭
+    let pool;
+    if (G.time < 20) {
+      pool = ['walking_dead','walking_dead','walking_dead','walking_dead','walking_dead','walking_dead','walking_dead'];
+    } else if (G.time < 40) {
+      pool = ['walking_dead','walking_dead','walking_dead','walking_dead','shadow_bat','shadow_bat','mech_hound','poison_spider','iron_puppet','ghost_warrior','bomb_ghoul','overload_bot'];
+    } else {
+      pool = [];
+      Object.keys(ENEMY_SPAWN).forEach(id=>{
+        const t = ENEMY_SPAWN[id];
+        const w = Math.max(0, Math.floor(t.weight * (d.hpScale >= 1.5 ? 0.7 : 1)));
+        for (let i=0;i<w;i++) pool.push(id);
+      });
+    }
+    const id = pick(pool);
+    const e = makeEnemy(id, x, y, d.hpScale, d.dmgScale);
+    if (e){
+      // 新生成的怪物在 1.5 秒内不能攻击玩家（让其先进入屏幕并被玩家看清）
+      e.attackCd = Math.max(e.attackCd || 0, 1.5);
+    }
+    G.enemies.push(e);
+  }
+  function spawnOneElite(d){
+    // 精英：从视口边缘外 100 像素生成
+    const w = G.view.w, h = G.view.h;
+    const camX = G.camera.x, camY = G.camera.y;
+    const margin = 100;
+    let x, y;
+    for (let tries=0; tries<6; tries++){
+      const side = Math.floor(Math.random() * 4);
+      if (side === 0){ x = camX + Math.random() * w; y = camY - margin; }
+      else if (side === 1){ x = camX + Math.random() * w; y = camY + h + margin; }
+      else if (side === 2){ x = camX - margin; y = camY + Math.random() * h; }
+      else { x = camX + w + margin; y = camY + Math.random() * h; }
+      x = clamp(x, 12, G.world.w - 12);
+      y = clamp(y, 12, G.world.h - 12);
+      if (dist2(x, y, G.player.x, G.player.y) >= 320 * 320) break;
+    }
+    const id = pickWeighted(ELITE_SPAWN);
+    const e = makeEnemy(id, x, y, 1, 1);
+    if (e){ e.attackCd = Math.max(e.attackCd || 0, 2.0); }
+    G.enemies.push(e);
+  }
+  function spawnOneBoss(){
+    // 首领：从视口边缘外 140 像素生成；随登场次数增强血量与攻击
+    const w = G.view.w, h = G.view.h;
+    const camX = G.camera.x, camY = G.camera.y;
+    const margin = 140;
+    let x, y;
+    for (let tries=0; tries<6; tries++){
+      const side = Math.floor(Math.random() * 4);
+      if (side === 0){ x = camX + Math.random() * w; y = camY - margin; }
+      else if (side === 1){ x = camX + Math.random() * w; y = camY + h + margin; }
+      else if (side === 2){ x = camX - margin; y = camY + Math.random() * h; }
+      else { x = camX + w + margin; y = camY + Math.random() * h; }
+      x = clamp(x, 16, G.world.w - 16);
+      y = clamp(y, 16, G.world.h - 16);
+      if (dist2(x, y, G.player.x, G.player.y) >= 380 * 380) break;
+    }
+    const id = Math.random() < 0.5 ? 'boss_demon' : 'boss_mech';
+    // 每 3 分钟为一阶段，血量与攻击递增（强度更高）
+    const stage = Math.max(0, Math.floor((G.time - 180) / 180));
+    const hpScale = 1 + stage * 0.6;
+    const dmgScale = 1 + stage * 0.2;
+    const e = makeEnemy(id, x, y, hpScale, dmgScale);
+    if (e){
+      e.attackCd = Math.max(e.attackCd || 0, 2.0);
+      // 体型也随阶段略微增大
+      e.size *= (1 + stage * 0.06);
+    }
+    G.enemies.push(e);
+  }
+
+  // ================== 道具掉落 ==================
+  // 稀有度权重：common=5, rare=2, epic=1；越稀有掉落概率越低
+  const RARITY_WEIGHTS = { common:5, rare:2, epic:1 };
+  function pickItemByRarity(){
+    const total = ITEMS.reduce((sum, it)=> sum + (RARITY_WEIGHTS[it.rarity] || 1), 0);
+    let r = Math.random() * total;
+    for (const it of ITEMS){
+      r -= RARITY_WEIGHTS[it.rarity] || 1;
+      if (r <= 0) return it.id;
+    }
+    return ITEMS[0].id;
+  }
+  // 按怪物等级计算基础掉落率
+  function getDropRateByLevel(level){
+    switch(level){
+      case 1: return 0.03; // 3%
+      case 2: return 0.06; // 6%
+      case 3: return 0.10; // 10%
+      case 4: return 1.00; // 100%（精英必掉）
+      case 5: return 1.00; // 100%（首领必掉宝箱）
+      default: return 0.05;
+    }
+  }
+  function tryDropItem(enemy){
+    const lvl = enemy.level || 1;
+    const rate = getDropRateByLevel(lvl);
+    if (Math.random() < rate){
+      if (enemy.isBoss){
+        // 首领 100% 掉宝箱
+        G.treasures.push(makeTreasure(enemy.x, enemy.y));
+        for (let i=0;i<6;i++){
+          const a = Math.random() * Math.PI * 2;
+          const r = rand(0, 22);
+          G.pickups.push(makePickup(enemy.x + Math.cos(a)*r, enemy.y + Math.sin(a)*r, 4));
+        }
+      } else {
+        const id = pickItemByRarity();
+        G.items.push(makeItem(id, enemy.x, enemy.y));
+        if (enemy.isElite){
+          for (let i=0;i<3;i++){
+            const a = Math.random() * Math.PI * 2;
+            const r = rand(0, 16);
+            G.pickups.push(makePickup(enemy.x + Math.cos(a)*r, enemy.y + Math.sin(a)*r, 2));
+          }
+        }
+      }
+    }
+  }
+
+  // ================== 开局武器选择 ==================
+  function showWeaponSelect(){
+    const list = [
+      { id:'dmg', name:'诛邪剑气', tag:'新武器', desc:'发射直线剑气，自动追踪最近敌人' },
+      { id:'aura', name:'剑气领域', tag:'新武器', desc:'生成持续伤害领域，靠近即伤' },
+      { id:'laser', name:'激光枪', tag:'新武器', desc:'每 2 秒发射一道穿透激光' },
+    ];
+    const c = document.getElementById('weapon-select-list');
+    c.innerHTML = '';
+    list.forEach(w=>{
+      const card = document.createElement('div');
+      card.className = 'upgrade-card';
+      card.innerHTML = '<div class="name">'+w.name+'<span class="tag">'+w.tag+'</span></div><div class="desc">'+w.desc+'</div>';
+      card.addEventListener('click', ()=>{
+        startGame(w.id);
+      });
+      c.appendChild(card);
+    });
+    showScreen('screen-weapon');
+  }
+
+  // ================== 升级 / 宝箱 ==================
+  function levelUp(){
+    G.player.level += 1;
+    G.player.xp = 0;
+    // 升级所需经验显著增加（后期曲线更陡）
+    G.player.xpNext = Math.floor(6 + G.player.level * G.player.level * 1.3 + G.player.level * 4);
+    G._upgradeRefreshUsed = false; // 每次升级重置刷新机会
+    const list = pickSkillChoices();
+    if (list.length === 0){
+      // 全部技能满级：直接奖励属性并回到游戏
+      G.player.maxHp += 15;
+      G.player.hp = Math.min(G.player.maxHp, G.player.hp + 15);
+      G.player.dmgMult *= 1.05;
+      showToast('全部技能已满级，生命上限 +15', 1200);
+      return;
+    }
+    renderSkillChoices(list, 'upgrade-list', 'screen-levelup', applySkill);
+    G.state = 'levelup';
+    showScreen('screen-levelup');
+  }
+  function pickSkillChoices(){
+    const learned = G.player.skills;
+    const available = SKILLS.filter(s => {
+      if ((learned[s.id]||0) >= s.max) return false;
+      if (s.req){
+        for (const r of s.req){
+          if ((learned[r]||0) < 1) return false;
+        }
+      }
+      return true;
+    });
+    const list = [];
+    for (let i=0;i<3 && available.length>0;i++){
+      const idx = randInt(0, available.length-1);
+      list.push(available[idx]);
+      available.splice(idx, 1);
+    }
+    return list; // 不再用满级技能兜底
+  }
+  function renderSkillChoices(list, containerId, screenId, onPick){
+    const c = document.getElementById(containerId);
+    c.innerHTML = '';
+    list.forEach(s=>{
+      const cur = G.player.skills[s.id] || 0;
+      const max = s.max;
+      const card = document.createElement('div');
+      card.className = 'upgrade-card';
+      card.innerHTML = '<div class="name">'+s.name+'<span class="lv">'+cur+' / '+max+'</span></div><div class="desc">'+s.desc+'</div>';
+      card.addEventListener('click', ()=>{
+        onPick(s.id);
+        showToast('已领悟：'+s.name+'（'+(cur+1)+'/'+max+'）', 900);
+        hideAllScreens();
+        G.state = 'playing';
+        if (G._pendingTreasure){ G._pendingTreasure = false; openTreasureScreen(); }
+      });
+      c.appendChild(card);
+    });
+
+    // 升级界面添加刷新按钮（每次升级仅可刷新一次）
+    if (screenId === 'screen-levelup'){
+      const refreshWrap = document.createElement('div');
+      refreshWrap.style.cssText = 'text-align:center;margin-top:10px;';
+      const refreshBtn = document.createElement('button');
+      refreshBtn.className = 'btn-refresh';
+      refreshBtn.textContent = G._upgradeRefreshUsed ? '已刷新' : '刷新奖励（1次）';
+      refreshBtn.disabled = G._upgradeRefreshUsed;
+      refreshBtn.addEventListener('click', ()=>{
+        if (G._upgradeRefreshUsed) return;
+        G._upgradeRefreshUsed = true;
+        const newList = pickSkillChoices();
+        if (newList.length === 0){
+          hideAllScreens();
+          G.state = 'playing';
+          showToast('没有可领悟的技能', 900);
+          return;
+        }
+        renderSkillChoices(newList, containerId, screenId, onPick);
+      });
+      refreshWrap.appendChild(refreshBtn);
+      c.appendChild(refreshWrap);
+    }
+  }
+  function openTreasureScreen(){
+    const list = [];
+    const pool = TREASURES.slice();
+    for (let i=0;i<4 && pool.length>0;i++){
+      const idx = randInt(0, pool.length-1);
+      list.push(pool[idx]);
+      pool.splice(idx, 1);
+    }
+    const c = document.getElementById('treasure-list');
+    c.innerHTML = '';
+    list.forEach(tr=>{
+      const card = document.createElement('div');
+      card.className = 'upgrade-card treasure';
+      card.innerHTML = '<div class="name">'+tr.name+'<span class="tag">秘宝</span></div><div class="desc">'+tr.desc+'</div>';
+      card.addEventListener('click', ()=>{
+        tr.apply(G.player);
+        showToast('获得秘宝：'+tr.name, 1200);
+        G._pendingTreasure = false;
+        hideAllScreens();
+        G.state = 'playing';
+      });
+      c.appendChild(card);
+    });
+    G.state = 'treasure';
+    showScreen('screen-treasure');
+  }
+
+  // ================== 暂停界面 ==================
+  function renderPausePanel(){
+    const p = G.player;
+    // 已习功法
+    skillPanel.innerHTML = '';
+    const learned = SKILLS.filter(s => (p.skills[s.id]||0) > 0);
+    if (learned.length === 0){
+      skillPanel.innerHTML = '<div style="font-size:12px;color:#778;padding:8px;">尚未领悟任何功法</div>';
+    } else {
+      learned.forEach(s=>{
+        const lv = p.skills[s.id];
+        const row = document.createElement('div');
+        row.className = 'skill-row';
+        row.innerHTML = '<span class="nm">'+s.name+' <span style="color:#9be7ff;font-size:11px;">['+s.tag+']</span></span><span class="lv">'+lv+' / '+s.max+'</span>';
+        skillPanel.appendChild(row);
+      });
+    }
+    // 武器装备
+    weaponPanel.innerHTML = '';
+    const weapons = [
+      { name:'诛邪剑气', desc:['伤害 '+(p.bulletDmg*p.dmgMult).toFixed(1),'攻速 '+(1/p.fireInterval).toFixed(2)+'/s','数量 '+p.bulletCount] },
+    ];
+    if (p.auraRadius > 0){
+      weapons.push({ name:'剑气领域', desc:['伤害/秒 '+(p.auraDmg*p.dmgMult).toFixed(1),'范围 '+p.auraRadius,'间隔 '+p.auraInterval.toFixed(2)+'s'] });
+    }
+    if (p.laserDmg > 0){
+      weapons.push({ name:'激光枪', desc:['伤害 '+(p.laserDmg*p.dmgMult).toFixed(1),'大小 ×'+p.laserWidthMult.toFixed(2),'数量 '+p.laserCount+' · 间隔 '+p.laserInterval.toFixed(2)+'s'] });
+    }
+    weapons.forEach(w=>{
+      const row = document.createElement('div');
+      row.className = 'skill-row';
+      row.innerHTML = '<span class="nm">'+w.name+'</span><span class="lv">'+w.desc.join(' · ')+'</span>';
+      weaponPanel.appendChild(row);
+    });
+    // 基础属性
+    const stat = document.createElement('div');
+    stat.className = 'skill-row';
+    stat.innerHTML = '<span class="nm">基础属性</span><span class="lv">HP '+p.maxHp+' · 移速 '+(p.speed*p.speedMult).toFixed(1)+' · 回血 '+p.regen.toFixed(1)+'/s · 经验 ×'+(p.xpMult).toFixed(2)+'</span>';
+    weaponPanel.appendChild(stat);
+  }
+
+  // ================== 图鉴 ==================
+  function openCodex(tab){
+    showScreen('screen-codex');
+    document.querySelectorAll('.codex-tab').forEach(x=>x.classList.remove('active'));
+    document.querySelector('.codex-tab[data-tab="'+tab+'"]').classList.add('active');
+    renderCodex(tab);
+  }
+  function renderCodex(tab){
+    codexList.innerHTML = '';
+    if (tab === 'skill'){
+      // 技能标签对应颜色
+      const tagColor = { '伤害':'#ff5e7e', '攻速':'#4be1ff', '移速':'#7ed957', '生存':'#7ed957', '弹幕':'#ffe45e', '成长':'#b478ff', '新武器':'#ff8c42' };
+      SKILLS.forEach(s=>{
+        const dotColor = tagColor[s.tag] || '#9be7ff';
+        const it = document.createElement('div');
+        it.className = 'codex-item';
+        const badgeColor = s.tag==='弹幕' ? '#b8a030' : dotColor;
+        let stats = '最高等级：'+s.max;
+        if (s.baseDmg){ stats += ' · 基础伤害：'+s.baseDmg; }
+        if (s.req && s.req.length){
+          const reqNames = s.req.map(id => SKILL_BY_ID[id] ? SKILL_BY_ID[id].name : id).join('、');
+          stats += ' · 前置：' + reqNames;
+        }
+        it.innerHTML = '<div class="head"><span class="nm"><span class="sw" style="background:'+dotColor+';width:10px;height:10px;border-radius:50%;display:inline-block;border:1.5px solid #000;margin-right:6px;vertical-align:middle;box-shadow:0 0 5px '+dotColor+'"></span>'+s.name+'</span><span class="badge" style="color:'+badgeColor+';border-color:'+badgeColor+';background:'+dotColor+'22;">'+s.tag+'</span></div><div class="desc">'+s.desc+'</div><div class="stats">'+stats+'</div>';
+        codexList.appendChild(it);
+      });
+      // 首领秘宝（稀有强化）
+      const trHeader = document.createElement('div');
+      trHeader.style.cssText = 'font-size:13px;color:#ff8c42;font-weight:700;margin:14px 0 4px;text-align:center;letter-spacing:1px;';
+      trHeader.textContent = '—— 首领秘宝（稀有强化）——';
+      codexList.appendChild(trHeader);
+      TREASURES.forEach(t=>{
+        const it = document.createElement('div');
+        it.className = 'codex-item';
+        it.style.borderColor = 'rgba(255,140,66,.35)';
+        it.style.background = 'linear-gradient(135deg, rgba(255,234,94,.05), rgba(255,140,66,.05))';
+        it.innerHTML = '<div class="head"><span class="nm"><span class="sw" style="background:#ff8c42;width:10px;height:10px;border-radius:50%;display:inline-block;border:1.5px solid #000;margin-right:6px;vertical-align:middle;box-shadow:0 0 6px #ff8c42"></span>'+t.name+'</span><span class="badge" style="color:#ff8c42;border-color:rgba(255,140,66,.5);background:rgba(255,140,66,.12);">秘宝</span></div><div class="desc">'+t.desc+'</div><div class="stats">来源：击败首领开启宝箱 4 选 1</div>';
+        codexList.appendChild(it);
+      });
+    } else if (tab === 'monster'){
+      MONSTERS.forEach(m=>{
+        const badgeCls = m.badge || 'normal';
+        const badgeTxt = m.badge==='elite' ? '精英' : (m.badge==='boss' ? '首领' : '普通');
+        const ringStyle = m.badge==='boss' ? 'box-shadow:0 0 8px #ff2e63,0 0 0 2px #ff2e63 inset' :
+                          m.badge==='elite' ? 'box-shadow:0 0 6px #ffea5e,0 0 0 2px #ffea5e inset' : '';
+        const it = document.createElement('div');
+        it.className = 'codex-item';
+        it.innerHTML =
+          '<div class="head"><span class="nm"><span class="sw" style="background:'+(m.color||'#888')+';width:10px;height:10px;border-radius:50%;display:inline-block;border:1.5px solid #000;margin-right:6px;vertical-align:middle;'+ringStyle+'"></span>'+m.name+'</span><span class="badge '+badgeCls+'">'+m.tag+' · Lv.'+(m.level||1)+' · '+badgeTxt+'</span></div>'+
+          '<div class="desc">'+m.desc+'</div>'+
+          '<div class="stats">HP '+m.hp+' · 攻击 '+m.dmg+' · 移速 '+m.speed+' · 经验 '+m.xp+'</div>';
+        codexList.appendChild(it);
+      });
+    } else if (tab === 'item'){
+      ITEMS.forEach(it=>{
+        const rarityName = { common:'普通', rare:'稀有', epic:'史诗' }[it.rarity] || '普通';
+        const rarityColor = { common:'#7ed957', rare:'#4be1ff', epic:'#ff8c42' }[it.rarity] || '#7ed957';
+        const el = document.createElement('div');
+        el.className = 'codex-item';
+        el.style.borderColor = it.color + '55';
+        el.style.background = 'linear-gradient(135deg, '+it.color+'11, transparent)';
+        el.innerHTML = '<div class="head"><span class="nm"><span class="sw" style="background:'+it.color+';width:10px;height:10px;border-radius:50%;display:inline-block;border:1.5px solid #000;margin-right:6px;vertical-align:middle;box-shadow:0 0 6px '+it.color+'"></span>'+it.name+'</span><span class="badge" style="color:'+rarityColor+';border-color:'+rarityColor+';background:'+rarityColor+'22;">'+rarityName+' · '+it.symbol+'</span></div><div class="desc">'+it.desc+'</div><div class="stats">拾取后自动生效</div>';
+        codexList.appendChild(el);
+      });
+      // 首领宝箱说明
+      const chestNote = document.createElement('div');
+      chestNote.className = 'codex-item';
+      chestNote.style.borderColor = 'rgba(255,234,94,.4)';
+      chestNote.style.background = 'linear-gradient(135deg, rgba(255,234,94,.08), rgba(255,140,66,.08))';
+      chestNote.innerHTML = '<div class="head"><span class="nm"><span class="sw" style="background:#ffea5e;width:10px;height:10px;border-radius:2px;display:inline-block;border:1.5px solid #000;margin-right:6px;vertical-align:middle;box-shadow:0 0 8px #ffea5e"></span>首领宝箱</span><span class="badge" style="color:#ffea5e;border-color:rgba(255,234,94,.5);background:rgba(255,234,94,.12);">🎁 战利品</span></div><div class="desc">击败首领后原地出现，拾取后开启天罡秘宝 4 选 1 界面，从 5 种稀有强化中选择 1 种永久获得。</div><div class="stats">产出：剑阵、御剑、雷火、时光、太乙</div>';
+      codexList.appendChild(chestNote);
+    }
+  }
+
+  // ================== HUD ==================
+  function refreshHUD(){
+    const p = G.player; if (!p) return;
+    hpFill.style.width = (p.hp/p.maxHp*100) + '%';
+    hpLabel.textContent = 'HP ' + Math.ceil(p.hp) + '/' + p.maxHp;
+    xpFill.style.width = (p.xp/p.xpNext*100) + '%';
+    xpLabel.textContent = 'Lv ' + p.level + '  ' + p.xp + '/' + p.xpNext;
+    killStat.textContent = G.kills;
+    timeStat.textContent = fmtTime(G.time);
+    scoreStat.textContent = G.score;
+    // 增益栏
+    const buffs = [];
+    if (p.iframes > 0) buffs.push({ name:'金身 '+p.iframes.toFixed(1)+'s', color:'#4be1ff' });
+    if (p.powerUpTime > 0) buffs.push({ name:'天罡 +50% ' +p.powerUpTime.toFixed(1)+'s', color:'#ff8c42' });
+    buffRow.innerHTML = buffs.map(b=>'<div class="buff-pill"><span class="dot" style="background:'+b.color+'"></span>'+b.name+'</div>').join('');
+  }
+
+  // ================== 流程 ==================
   function refreshStartBest(){
     const s = loadSave();
     startBest.textContent = '最佳生存：'+(s.bestTime?fmtTime(s.bestTime):'--')+'  ·  最高分：'+(s.bestScore||'--');
     bestStat.textContent = s.bestScore||0;
   }
 
-  function startGame(){
+  function startGame(startWeaponId){
     G.state = 'playing';
-    G.time = 0;
-    G.realTime = 0;
-    G.score = 0;
-    G.kills = 0;
-    G.spawnTimer = 0;
-    G.spawnInterval = 1.6;
-    G.bossSpawned = false;
-    G.shake = 0;
+    G.time = 0; G.realTime = 0;
+    G.score = 0; G.kills = 0;
+    G.spawnTimer = 3.0; G.eliteTimer = 12; G.bossTimer = 0;
+    G.nextBossAt = 180; G.bossInterval = 180;
+    G.shake = 0; G._pendingTreasure = false;
     G.enemies.length = 0;
     G.bullets.length = 0;
+    G.enemyBullets.length = 0;
+    G.lasers.length = 0;
     G.pickups.length = 0;
+    G.items.length = 0;
+    G.treasures.length = 0;
     G.particles.length = 0;
     G.damageNums.length = 0;
     G.player = makePlayer(G.world.w/2, G.world.h/2);
+    // 初始武器
+    if (startWeaponId) applySkill(startWeaponId);
+    // 初始 2 秒无敌，让玩家先看清场景
+    G.player.iframes = 2.0;
+    G.player.facing = -Math.PI/2; // 默认朝上
     updateCamera();
     hud.style.display = '';
     joystick.style.display = '';
     refreshHUD();
     hideAllScreens();
-    setTimeout(()=>{ if (hint) hint.style.opacity = '0.6'; }, 4000);
+    showToast('开始挑战！前 2 秒无敌', 1400);
+    setTimeout(()=>{ if (hint) hint.style.opacity = '0'; }, 4500);
   }
-
   function pauseGame(){
     if (G.state !== 'playing') return;
     G.state = 'paused';
+    renderPausePanel();
     showScreen('screen-pause');
   }
   function resumeGame(){
@@ -488,104 +1225,10 @@
     showScreen('screen-over');
   }
 
-  // ================== 升级 ==================
-  function levelUp(){
-    G.player.level += 1;
-    G.player.xp = 0;
-    G.player.xpNext = Math.floor(5 + G.player.level * 4);
-    // 3 张卡
-    const pool = UPGRADES.filter(u => !(u.once && G.player._picked && G.player._picked[u.id]));
-    const list = [];
-    for (let i=0;i<3;i++){
-      const arr = pool.filter(u => !list.includes(u));
-      if (arr.length === 0) break;
-      list.push(pick(arr));
-    }
-    renderUpgradeChoices(list);
-    G.state = 'levelup';
-    showScreen('screen-levelup');
-  }
-  function renderUpgradeChoices(list){
-    upgradeListEl.innerHTML = '';
-    list.forEach(u=>{
-      const card = document.createElement('div');
-      card.className = 'upgrade-card';
-      card.innerHTML = '<div class="name">'+u.name+'<span class="tag">'+u.tag+'</span></div><div class="desc">'+u.desc+'</div>';
-      card.addEventListener('click', ()=>{
-        u.apply(G.player);
-        G.player._picked = G.player._picked || {};
-        G.player._picked[u.id] = true;
-        showToast('已获得：'+u.name, 900);
-        hideAllScreens();
-        G.state = 'playing';
-      });
-      upgradeListEl.appendChild(card);
-    });
-  }
-
-  // ================== HUD ==================
-  function refreshHUD(){
-    const p = G.player; if (!p) return;
-    hpFill.style.width = (p.hp/p.maxHp*100) + '%';
-    hpLabel.textContent = 'HP ' + Math.ceil(p.hp) + '/' + p.maxHp;
-    xpFill.style.width = (p.xp/p.xpNext*100) + '%';
-    xpLabel.textContent = 'Lv ' + p.level + '  ' + p.xp + '/' + p.xpNext;
-    killStat.textContent = G.kills;
-    timeStat.textContent = fmtTime(G.time);
-    scoreStat.textContent = G.score;
-  }
-
-  // ================== 敌人刷新 ==================
-  function spawnEnemies(dt){
-    if (G.state !== 'playing') return;
-    G.spawnTimer -= dt;
-    // 难度递增：60s 后进入高压
-    const t = G.time;
-    const rate = Math.max(0.18, 1.6 - t * 0.018);
-    if (G.spawnTimer <= 0){
-      G.spawnInterval = rate;
-      G.spawnTimer = G.spawnInterval;
-      const count = t < 30 ? randInt(1,2) : (t < 90 ? randInt(2,4) : randInt(4,7));
-      for (let i=0;i<count;i++) spawnOneEnemy();
-    }
-    // Boss
-    if (!G.bossSpawned && t >= 30){
-      G.bossSpawned = true;
-      spawnOneEnemy(true);
-      showToast('⚠ Boss 出现！', 1600);
-    }
-    // 每 60 秒额外 Boss
-    if (G.bossSpawned && Math.floor(t) > 0 && Math.floor(t) % 60 === 0 && Math.floor(t) !== G._lastBossMin){
-      G._lastBossMin = Math.floor(t);
-      if (t >= 60) spawnOneEnemy(true);
-    }
-  }
-  function spawnOneEnemy(forceBoss){
-    // 在世界边缘外侧生成，再进入视野
-    const p = G.player;
-    const margin = 40;
-    let x, y;
-    const side = randInt(0,3);
-    if (side === 0){ x = rand(margin, G.world.w - margin); y = -margin; }
-    else if (side === 1){ x = G.world.w + margin; y = rand(margin, G.world.h - margin); }
-    else if (side === 2){ x = rand(margin, G.world.w - margin); y = G.world.h + margin; }
-    else { x = -margin; y = rand(margin, G.world.h - margin); }
-    let type;
-    if (forceBoss) type = 'boss';
-    else {
-      const pool = ['zombie','zombie','zombie','bat','bat','brute'];
-      type = pick(pool);
-    }
-    const hpScale = 1 + G.time * 0.025;
-    const dmgScale = 1 + G.time * 0.015;
-    G.enemies.push(makeEnemy(type, x, y, hpScale, dmgScale));
-  }
-
   // ================== 更新 ==================
   function updatePlaying(dt){
     G.time += dt;
     const p = G.player;
-    // 输入：摇杆 + 键盘
     let ax = G.input.ax, ay = G.input.ay;
     if (keys['arrowleft'] || keys['a']) ax -= 1;
     if (keys['arrowright'] || keys['d']) ax += 1;
@@ -593,43 +1236,42 @@
     if (keys['arrowdown'] || keys['s']) ay += 1;
     const mag = len(ax, ay);
     if (mag > 1){ ax/=mag; ay/=mag; }
-    const sp = p.speed * p.speedMult * 60 * dt;  // 像素/秒
+    const sp = p.speed * p.speedMult * 60 * dt;
     p.x += ax * sp;
     p.y += ay * sp;
     p.x = clamp(p.x, p.size, G.world.w - p.size);
     p.y = clamp(p.y, p.size, G.world.h - p.size);
     if (mag > 0.1){ p.facing = Math.atan2(ay, ax); p.trail = 0.3; }
     p.trail = Math.max(0, p.trail - dt);
-
     if (p.iframes > 0) p.iframes -= dt;
-    if (p.regen > 0 && p.hp < p.maxHp){
-      p.hp = Math.min(p.maxHp, p.hp + p.regen * dt);
-    }
+    if (p.powerUpTime > 0) p.powerUpTime -= dt;
+    if (p.regen > 0 && p.hp < p.maxHp) p.hp = Math.min(p.maxHp, p.hp + p.regen * dt);
     p.fireCd -= dt;
     p.auraCd -= dt;
+    p.laserCd -= dt;
 
-    // 自动攻击
+    // 自动攻击（始终发射剑气，无目标时朝朝向方向）
     if (p.fireCd <= 0){
-      // 找最近敌人
       const target = findNearestEnemy(p);
+      p.fireCd = p.fireInterval;
+      // 即使没有目标也发射剑气（朝当前朝向），让玩家看到技能在释放
       if (target){
-        p.fireCd = p.fireInterval;
         fireBullets(p, target);
       } else {
-        p.fireCd = 0.15;
+        const fake = { x: p.x + Math.cos(p.facing) * 100, y: p.y + Math.sin(p.facing) * 100 };
+        fireBullets(p, fake);
       }
     }
     // 光环
     if (p.auraDmg > 0 && p.auraCd <= 0){
       p.auraCd = p.auraInterval;
+      const aDmg = p.auraDmg * p.dmgMult * (p.powerUpTime>0?1.5:1);
       for (let i=G.enemies.length-1;i>=0;i--){
         const e = G.enemies[i];
-        const d2 = dist2(p.x, p.y, e.x, e.y);
-        if (d2 < p.auraRadius * p.auraRadius){
-          damageEnemy(e, p.auraDmg * p.dmgMult, p);
+        if (dist2(p.x, p.y, e.x, e.y) < p.auraRadius * p.auraRadius){
+          damageEnemy(e, aDmg, p, false);
         }
       }
-      // 光环粒子
       const n = 14;
       for (let i=0;i<n;i++){
         const a = (i/n) * Math.PI * 2;
@@ -637,29 +1279,169 @@
       }
     }
 
+    // 激光枪
+    if (p.laserDmg > 0 && p.laserCd <= 0){
+      p.laserCd = p.laserInterval;
+      fireLasers(p);
+    }
+
     // 敌人 AI
     for (let i=G.enemies.length-1;i>=0;i--){
       const e = G.enemies[i];
       e.flash = Math.max(0, e.flash - dt);
+      e.auraPhase = (e.auraPhase || 0) + dt;
       e.knock *= 0.85;
       if (e.knock < 0.05){ e.knock = 0; e.knockX = 0; e.knockY = 0; }
-      // 朝玩家
       const dx = p.x - e.x, dy = p.y - e.y;
       const d = len(dx, dy) || 1;
-      const sp = e.speed * 60 * dt;
-      e.x += (dx/d) * sp + e.knockX;
-      e.y += (dy/d) * sp + e.knockY;
-      // 接触伤害
+      const minDist = e.size + p.size + 2;
+
+      // ===== 本帧速度倍率与移动方向 =====
+      let speedMult = 1;
+      let moveDx = dx, moveDy = dy; // 默认朝玩家方向
+
+      // 冲刺型 AI（shadow_bat, mech_hound）：接近玩家时停顿后直线冲刺
+      if (e.attackType === 'dash'){
+        if (e.dashCd > 0) e.dashCd -= dt;
+        if (e.dashState === 0){
+          // 行走阶段：进入冲刺范围且冷却完毕，开始停顿蓄力
+          if (d < 220 && e.dashCd <= 0){
+            e.dashState = 1;
+            e.dashTimer = 0.45;
+            // 锁定冲刺方向（朝向玩家当前位置）
+            e.dashDx = dx/d; e.dashDy = dy/d;
+          }
+        } else if (e.dashState === 1){
+          // 停顿蓄力：原地不动，闪烁预警
+          speedMult = 0;
+          e.dashTimer -= dt;
+          if (Math.floor(G.realTime * 14) % 2 === 0) e.flash = 0.25;
+          if (e.dashTimer <= 0){
+            e.dashState = 2;
+            e.dashTimer = 0.4; // 冲刺持续时间
+          }
+        } else if (e.dashState === 2){
+          // 直线冲刺：使用锁定方向，高速移动
+          speedMult = 4.5;
+          moveDx = e.dashDx; moveDy = e.dashDy;
+          e.dashTimer -= dt;
+          if (e.dashTimer <= 0){
+            e.dashState = 3;
+            e.dashTimer = 0.6; // 冲刺后短暂冷却
+          }
+        } else if (e.dashState === 3){
+          // 冲刺后冷却：减速移动
+          speedMult = 0.6;
+          e.dashTimer -= dt;
+          if (e.dashTimer <= 0){
+            e.dashState = 0;
+            e.dashCd = 1.5; // 下次冲刺前的冷却
+          }
+        }
+      }
+
+      // 自爆型 AI（bomb_ghoul, overload_bot）：接近玩家时加速冲锋，贴脸后进入 1 秒自爆倒计时
+      if (e.attackType === 'suicide'){
+        const aggroRange = 260;     // 加速冲锋触发距离
+        const explodeRange = e.size + p.size + 28;
+        if (e.explodeTimer < 0){
+          // 未进入自爆倒计时
+          if (d < explodeRange){
+            // 已贴脸：进入 1 秒自爆倒计时
+            e.explodeTimer = 1.0;
+          } else if (d < aggroRange){
+            // 加速冲锋：2 秒内接近玩家（约 2.5 倍速）
+            speedMult = 2.5;
+          }
+        } else {
+          // 自爆倒计时中：原地不动 + 闪烁预警
+          speedMult = 0;
+          e.explodeTimer -= dt;
+          if (Math.floor(G.realTime * 14) % 2 === 0) e.flash = 0.3;
+          if (e.explodeTimer <= 0){
+            // 爆炸：对范围内玩家造成伤害
+            if (p.iframes <= 0 && d < explodeRange + 24){
+              p.hp -= e.dmg;
+              p.iframes = 0.6;
+              G.shake = Math.min(12, G.shake + 7);
+              spawnBurst(p.x, p.y, e.color, 10, 3);
+              if (p.hp <= 0){ p.hp = 0; endGame(false); return; }
+            }
+            // 爆炸粒子
+            for (let k=0;k<14;k++){
+              const a = Math.random()*Math.PI*2;
+              const spd = rand(20, 80);
+              G.particles.push(makeParticle(e.x, e.y, e.color, 0.5, rand(3,6), Math.cos(a)*spd, Math.sin(a)*spd));
+            }
+            killEnemy(e, i, p);
+            continue;
+          }
+        }
+      }
+
+      // ===== 实际移动 =====
+      const sp = e.speed * 60 * dt * speedMult;
+      if (sp > 0){
+        const moveLen = len(moveDx, moveDy) || 1;
+        const dirX = moveDx / moveLen, dirY = moveDy / moveLen;
+        // 限制最大移动距离，避免一帧内穿过玩家
+        let finalSp = sp;
+        if (d > minDist && d < minDist + sp && e.attackType !== 'dash') {
+          finalSp = d - minDist;
+        }
+        e.x += dirX * finalSp + e.knockX;
+        e.y += dirY * finalSp + e.knockY;
+        // 软碰撞：怪物不能进入玩家身体（冲刺中也保留，避免穿过玩家）
+        const newDx = p.x - e.x, newDy = p.y - e.y;
+        const newD2 = newDx*newDx + newDy*newDy;
+        if (newD2 < minDist * minDist && newD2 > 0.01){
+          const newD = Math.sqrt(newD2);
+          e.x = p.x - (newDx / newD) * minDist;
+          e.y = p.y - (newDy / newD) * minDist;
+        }
+      } else {
+        // 停顿/倒计时时仅应用击退
+        e.x += e.knockX;
+        e.y += e.knockY;
+      }
       if (e.attackCd > 0) e.attackCd -= dt;
-      if (d < e.size + p.size + 2 && p.iframes <= 0){
-        p.hp -= e.dmg;
-        p.iframes = 0.5;
-        G.shake = Math.min(10, G.shake + 4);
-        e.attackCd = 0.8;
-        // 击退
-        e.knock = 0.5; e.knockX = -dx/d*5; e.knockY = -dy/d*5;
-        spawnBurst(p.x, p.y, '#ff2e63', 8, 2);
-        if (p.hp <= 0){ p.hp = 0; endGame(false); return; }
+
+      // 远程攻击（精英、首领）
+      if (e.projectile){
+        if (e.rangedCd > 0) e.rangedCd -= dt;
+        if (e.rangedCd <= 0 && d <= e.projectile.range){
+          e.rangedCd = e.projectile.cd;
+          const bossStage = e.isBoss ? Math.max(0, Math.floor((G.time - 180) / 180)) : 0;
+          const projDmg = e.projectile.dmg * (e.isBoss ? (1 + bossStage * 0.15) : 1);
+          G.enemyBullets.push(makeEnemyBullet(e.x, e.y, dx/d, dy/d, projDmg, e.projectile.speed, e.projectile.range, e.projectile.color, e.projectile.size));
+        }
+      }
+
+      // 攻击处理
+      if (e.attackType === 'suicide'){
+        // 自爆怪的伤害在爆炸时一次性结算，此处不再处理近战
+      } else if (e.attackType === 'dash'){
+        // 冲刺型：仅在冲刺中接触玩家造成伤害
+        if (e.dashState === 2 && d < e.size + p.size + 4 && p.iframes <= 0 && e.attackCd <= 0){
+          p.hp -= e.dmg;
+          p.iframes = 0.5;
+          G.shake = Math.min(10, G.shake + 4);
+          e.attackCd = 0.8;
+          e.knock = 0.5; e.knockX = -dx/d*5; e.knockY = -dy/d*5;
+          spawnBurst(p.x, p.y, '#ff2e63', 8, 2);
+          if (p.hp <= 0){ p.hp = 0; endGame(false); return; }
+        }
+      } else {
+        // 近战攻击
+        if (d < e.size + p.size + 2 && p.iframes <= 0 && e.attackCd <= 0){
+          p.hp -= e.dmg;
+          p.iframes = 0.5;
+          G.shake = Math.min(10, G.shake + 4);
+          e.attackCd = 0.8;
+          e.knock = 0.5; e.knockX = -dx/d*5; e.knockY = -dy/d*5;
+          spawnBurst(p.x, p.y, '#ff2e63', 8, 2);
+          if (p.hp <= 0){ p.hp = 0; endGame(false); return; }
+        }
       }
     }
     // 子弹
@@ -672,15 +1454,42 @@
       if (b.life <= 0 || b.dist >= b.range || b.x < -10 || b.x > G.world.w+10 || b.y < -10 || b.y > G.world.h+10){
         G.bullets.splice(i,1); continue;
       }
-      // 命中
       for (let j=G.enemies.length-1;j>=0;j--){
         const e = G.enemies[j];
         if (dist2(b.x, b.y, e.x, e.y) < (e.size + 4) * (e.size + 4)){
-          damageEnemy(e, b.dmg, p);
+          const dmg = b.dmg * (p.powerUpTime>0?1.5:1);
+          damageEnemy(e, dmg, p, true);
           G.bullets.splice(i,1);
           break;
         }
       }
+    }
+    // 敌方子弹
+    for (let i=G.enemyBullets.length-1;i>=0;i--){
+      const b = G.enemyBullets[i];
+      b.x += b.dx * b.speed * 60 * dt;
+      b.y += b.dy * b.speed * 60 * dt;
+      b.dist += b.speed * 60 * dt;
+      b.life -= dt;
+      if (b.life <= 0 || b.dist >= b.range || b.x < -10 || b.x > G.world.w+10 || b.y < -10 || b.y > G.world.h+10){
+        G.enemyBullets.splice(i,1); continue;
+      }
+      if (dist2(b.x, b.y, p.x, p.y) < (p.size + b.size) * (p.size + b.size)){
+        if (p.iframes <= 0){
+          p.hp -= b.dmg;
+          p.iframes = 0.4;
+          G.shake = Math.min(10, G.shake + 3);
+          spawnBurst(p.x, p.y, b.color, 6, 2);
+          if (p.hp <= 0){ p.hp = 0; endGame(false); return; }
+        }
+        G.enemyBullets.splice(i,1);
+      }
+    }
+    // 激光视觉效果
+    for (let i=G.lasers.length-1;i>=0;i--){
+      const l = G.lasers[i];
+      l.life -= dt;
+      if (l.life <= 0){ G.lasers.splice(i,1); }
     }
     // 经验
     for (let i=G.pickups.length-1;i>=0;i--){
@@ -692,15 +1501,54 @@
       const pr = p.pickupRange;
       if (d2 < pr * pr){
         const d = Math.sqrt(d2) || 1;
-        const speed = 6 * 60 * dt;
-        pk.x += (dx/d) * speed;
-        pk.y += (dy/d) * speed;
+        pk.x += (dx/d) * 6 * 60 * dt;
+        pk.y += (dy/d) * 6 * 60 * dt;
       }
       if (d2 < (p.size + pk.size + 2) * (p.size + pk.size + 2)){
         G.pickups.splice(i,1);
         const gain = Math.max(1, Math.floor(pk.xp * p.xpMult));
         p.xp += gain;
         if (p.xp >= p.xpNext) levelUp();
+      }
+    }
+    // 道具
+    for (let i=G.items.length-1;i>=0;i--){
+      const it = G.items[i];
+      it.life -= dt;
+      it.bob += dt * 4;
+      if (it.life <= 0){ G.items.splice(i,1); continue; }
+      const d2 = dist2(p.x, p.y, it.x, it.y);
+      const pr = p.pickupRange + 30;
+      if (d2 < pr * pr){
+        const d = Math.sqrt(d2) || 1;
+        const speed = 5 * 60 * dt;
+        it.x += ((p.x-it.x)/d) * speed;
+        it.y += ((p.y-it.y)/d) * speed;
+      }
+      if (d2 < (p.size + 10) * (p.size + 10)){
+        const def = ITEM_BY_ID[it.id];
+        def.effect(p);
+        G.items.splice(i,1);
+        spawnBurst(it.x, it.y, def.color, 12, 2);
+      }
+    }
+    // 宝箱
+    for (let i=G.treasures.length-1;i>=0;i--){
+      const tr = G.treasures[i];
+      tr.life -= dt;
+      tr.bob += dt * 2;
+      if (tr.life <= 0){ G.treasures.splice(i,1); continue; }
+      const d2 = dist2(p.x, p.y, tr.x, tr.y);
+      if (d2 < (p.size + 18) * (p.size + 18)){
+        // 拾取宝箱
+        G.treasures.splice(i,1);
+        spawnBurst(tr.x, tr.y, '#ffea5e', 30, 3);
+        G.shake = 8;
+        if (G.state === 'playing'){
+          openTreasureScreen();
+        } else {
+          G._pendingTreasure = true;
+        }
       }
     }
     // 粒子
@@ -717,13 +1565,11 @@
       dn.y -= 30 * dt;
       if (dn.life <= 0) G.damageNums.splice(i,1);
     }
-    // 屏幕震动衰减
     if (G.shake > 0) G.shake = Math.max(0, G.shake - dt*30);
 
     spawnEnemies(dt);
 
-    // 分数
-    G.score = Math.floor(G.time * 5) + G.kills * 8;
+    G.score = Math.floor(G.time * 3) + G.kills * 10;
   }
 
   function findNearestEnemy(p){
@@ -746,10 +1592,38 @@
     }
     G.particles.push(makeParticle(p.x, p.y, '#ffe45e', 0.18, 2));
   }
-  function damageEnemy(e, dmg, p){
+  function fireLasers(p){
+    const target = findNearestEnemy(p);
+    let baseA = p.facing;
+    if (target) baseA = Math.atan2(target.y - p.y, target.x - p.x);
+    const n = p.laserCount;
+    const spread = n > 1 ? 0.14 : 0;
+    const width = (10 + n * 2) * p.laserWidthMult;
+    // 激光射程：当前游戏界面最短边的一半
+    const range = Math.min(G.view.w, G.view.h) / 2;
+    for (let i=0;i<n;i++){
+      const a = baseA + (n===1?0:(i - (n-1)/2) * spread);
+      const dx = Math.cos(a), dy = Math.sin(a);
+      const ex = p.x + dx * range;
+      const ey = p.y + dy * range;
+      G.lasers.push(makeLaser(p.x, p.y, dx, dy, p.laserDmg * p.dmgMult, range, width));
+      // 激光穿透，对路径上所有敌人造成伤害
+      const lDmg = p.laserDmg * p.dmgMult * (p.powerUpTime>0?1.5:1);
+      for (let j=G.enemies.length-1;j>=0;j--){
+        const e = G.enemies[j];
+        const d = distToSegment(e.x, e.y, p.x, p.y, ex, ey);
+        if (d < e.size + width*0.5){
+          damageEnemy(e, lDmg, p, true);
+        }
+      }
+    }
+    G.particles.push(makeParticle(p.x, p.y, '#ff2e63', 0.22, 3));
+    G.shake = Math.min(6, G.shake + 2);
+  }
+  function damageEnemy(e, dmg, p, byBullet){
     e.hp -= dmg;
     e.flash = 0.1;
-    G.damageNums.push(makeDamageNum(e.x, e.y - e.size, Math.ceil(dmg), '#ffe45e'));
+    G.damageNums.push(makeDamageNum(e.x + rand(-6,6), e.y - e.size, Math.max(1, Math.ceil(dmg)), byBullet ? '#ffe45e' : '#ff8a4d'));
     if (e.hp <= 0){
       killEnemy(e, p);
     } else {
@@ -757,18 +1631,24 @@
     }
   }
   function killEnemy(e, p){
-    // 掉落经验
-    const count = e.isBoss ? 12 : (e.xp >= 3 ? 3 : 1);
-    const per = e.isBoss ? Math.ceil(e.xp/12) : e.xp;
+    // 经验掉落
+    let count, per;
+    if (e.isBoss){ count = 14; per = 3; }
+    else if (e.isElite){ count = 6; per = 2; }
+    else { count = e.xp >= 3 ? 3 : 1; per = e.xp; }
     for (let i=0;i<count;i++){
       const a = Math.random() * Math.PI * 2;
-      const r = rand(0, 16);
+      const r = rand(0, 18);
       G.pickups.push(makePickup(e.x + Math.cos(a)*r, e.y + Math.sin(a)*r, per));
     }
-    spawnBurst(e.x, e.y, e.isBoss?'#ff2e63':'#7ed957', e.isBoss?40:12, e.isBoss?4:2.2);
+    // 道具掉落
+    tryDropItem(e);
+    // 视觉
+    spawnBurst(e.x, e.y, e.isBoss?'#ff2e63':(e.isElite?'#ffea5e':'#7ed957'), e.isBoss?40:(e.isElite?18:10), e.isBoss?4:2);
     if (e.isBoss){
+      const bossName = MONSTER_BY_ID[e.id] ? MONSTER_BY_ID[e.id].name : '首领';
       G.shake = 18;
-      showToast('Boss 已被击败！', 1400);
+      showToast('【'+bossName+'】已被击败！开启天罡秘宝', 1800);
     }
     G.kills += 1;
     G.score += e.score;
@@ -787,39 +1667,39 @@
   function render(){
     const w = G.view.w, h = G.view.h;
     ctx.save();
-    // 屏幕震动
     if (G.shake > 0){
       const sx = (Math.random()-0.5) * G.shake;
       const sy = (Math.random()-0.5) * G.shake;
       ctx.translate(sx, sy);
     }
-    // 背景
+    // 背景：双主题渐变（紫蓝 + 青绿）
     const grad = ctx.createRadialGradient(w/2, h/2, 50, w/2, h/2, Math.max(w,h));
-    grad.addColorStop(0, '#1a1230');
+    grad.addColorStop(0, '#1a1530');
+    grad.addColorStop(0.5, '#0a1020');
     grad.addColorStop(1, '#05050a');
     ctx.fillStyle = grad;
     ctx.fillRect(0,0,w,h);
 
-    // 摄像机
-    const camX = G.camera.x, camY = G.camera.y;
     // 网格
-    ctx.strokeStyle = 'rgba(120,80,200,.10)';
+    ctx.strokeStyle = 'rgba(120,180,200,.07)';
     ctx.lineWidth = 1;
     const cell = 60;
-    const sx0 = -((camX) % cell);
-    const sy0 = -((camY) % cell);
-    for (let x=sx0; x<w; x+=cell){
-      ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke();
-    }
-    for (let y=sy0; y<h; y+=cell){
-      ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke();
-    }
+    const camX = G.camera.x, camY = G.camera.y;
+    const sx0 = -(camX % cell);
+    const sy0 = -(camY % cell);
+    for (let x=sx0; x<w; x+=cell){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke(); }
+    for (let y=sy0; y<h; y+=cell){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); }
+
     // 世界边界
-    ctx.strokeStyle = 'rgba(255,80,160,.7)';
+    ctx.strokeStyle = 'rgba(255,80,160,.6)';
     ctx.lineWidth = 3;
     ctx.strokeRect(-camX, -camY, G.world.w, G.world.h);
+    // 内层科幻光带
+    ctx.strokeStyle = 'rgba(80,200,255,.25)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(-camX+4, -camY+4, G.world.w-8, G.world.h-8);
 
-    // 拾取
+    // 拾取（经验宝石）
     for (const pk of G.pickups){
       const px = pk.x - camX, py = pk.y - camY;
       const a = 0.6 + 0.4 * Math.sin(G.realTime*5 + pk.x);
@@ -833,38 +1713,189 @@
       ctx.fill();
     }
 
+    // 道具
+    for (const it of G.items){
+      const def = ITEM_BY_ID[it.id];
+      const px = it.x - camX, py = it.y - camY + Math.sin(it.bob)*3;
+      // 光晕
+      const glow = ctx.createRadialGradient(px, py, 2, px, py, 18);
+      glow.addColorStop(0, def.color);
+      glow.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = glow;
+      ctx.globalAlpha = 0.55;
+      ctx.beginPath(); ctx.arc(px, py, 18, 0, Math.PI*2); ctx.fill();
+      ctx.globalAlpha = 1;
+      // 本体
+      ctx.fillStyle = def.color;
+      ctx.beginPath();
+      ctx.arc(px, py, 10, 0, Math.PI*2);
+      ctx.fill();
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 12px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(def.symbol, px, py+1);
+    }
+
+    // 宝箱
+    for (const tr of G.treasures){
+      const px = tr.x - camX, py = tr.y - camY + Math.sin(tr.bob)*4;
+      const glow = ctx.createRadialGradient(px, py, 2, px, py, 28);
+      glow.addColorStop(0, 'rgba(255,234,94,.9)');
+      glow.addColorStop(1, 'rgba(255,234,94,0)');
+      ctx.fillStyle = glow;
+      ctx.beginPath(); ctx.arc(px, py, 28, 0, Math.PI*2); ctx.fill();
+      // 箱体
+      ctx.fillStyle = '#5a3a10';
+      ctx.fillRect(px-14, py-10, 28, 20);
+      ctx.fillStyle = '#ffea5e';
+      ctx.fillRect(px-14, py-2, 28, 4);
+      ctx.fillStyle = '#ff8c42';
+      ctx.fillRect(px-3, py-10, 6, 20);
+      ctx.strokeStyle = '#000';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(px-14, py-10, 28, 20);
+    }
+
+    // 屏幕外敌人方向指示器（预警）
+    if (G.player && G.enemies.length){
+      const ppx = G.player.x - camX, ppy = G.player.y - camY;
+      const margin = 28;
+      // 按方向分组统计数量
+      const dirs = { top:0, right:0, bottom:0, left:0 };
+      for (const e of G.enemies){
+        const ex = e.x - camX, ey = e.y - camY;
+        if (ex < 0) dirs.left++;
+        else if (ex > w) dirs.right++;
+        else if (ey < 0) dirs.top++;
+        else if (ey > h) dirs.bottom++;
+      }
+      const drawArrow = (cnt, tx, ty, ang) => {
+        if (cnt <= 0) return;
+        const pulse = 0.7 + 0.3 * Math.sin(G.realTime * 5);
+        ctx.save();
+        ctx.translate(tx, ty);
+        ctx.rotate(ang);
+        ctx.fillStyle = 'rgba(255,46,99,'+(0.55*pulse)+')';
+        ctx.strokeStyle = 'rgba(0,0,0,.6)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(8, 0);
+        ctx.lineTo(-6, -7);
+        ctx.lineTo(-3, 0);
+        ctx.lineTo(-6, 7);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+        // 数量
+        ctx.fillStyle = '#ffea5e';
+        ctx.font = 'bold 11px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(cnt, tx, ty);
+      };
+      drawArrow(dirs.top,    w/2, margin,           Math.PI/2);    // 屏幕上方
+      drawArrow(dirs.bottom, w/2, h - margin,       -Math.PI/2);  // 屏幕下方
+      drawArrow(dirs.left,   margin, h/2,           0);           // 屏幕左侧
+      drawArrow(dirs.right,  w - margin, h/2,       Math.PI);      // 屏幕右侧
+    }
+
     // 敌人
     for (const e of G.enemies){
       const ex = e.x - camX, ey = e.y - camY;
-      if (ex < -50 || ex > w+50 || ey < -50 || ey > h+50) continue;
+      // 渲染范围：屏幕外 500 像素（视口对角线 ~764 像素，最远 404 像素在屏外）
+      if (ex < -500 || ex > w+500 || ey < -500 || ey > h+500) continue;
       // 阴影
       ctx.fillStyle = 'rgba(0,0,0,.4)';
       ctx.beginPath();
       ctx.ellipse(ex, ey + e.size*0.7, e.size*0.7, e.size*0.3, 0, 0, Math.PI*2);
       ctx.fill();
-      // 身体
+      // 身体（先画深色描边，再填色，让怪物在玩家身上时也能看见）
+      ctx.fillStyle = '#000';
+      ctx.beginPath();
+      ctx.arc(ex, ey, e.size + 1.5, 0, Math.PI*2);
+      ctx.fill();
       ctx.fillStyle = e.flash > 0 ? '#ffffff' : e.color;
       ctx.beginPath();
       ctx.arc(ex, ey, e.size, 0, Math.PI*2);
       ctx.fill();
-      if (e.isBoss){
-        ctx.strokeStyle = 'rgba(255,234,94,.8)';
-        ctx.lineWidth = 3;
+      // 主题装饰：仙侠 vs 科幻
+      if (e.theme === 'xianxia'){
+        ctx.strokeStyle = 'rgba(255,255,255,.4)';
+        ctx.lineWidth = 1.5;
         ctx.beginPath();
-        ctx.arc(ex, ey, e.size + 4 + Math.sin(G.realTime*4)*2, 0, Math.PI*2);
+        ctx.arc(ex, ey, e.size*0.6, 0, Math.PI*2);
         ctx.stroke();
       } else {
-        ctx.fillStyle = 'rgba(0,0,0,.6)';
-        ctx.beginPath(); ctx.arc(ex-3, ey-3, 2.2, 0, Math.PI*2); ctx.fill();
-        ctx.beginPath(); ctx.arc(ex+3, ey-3, 2.2, 0, Math.PI*2); ctx.fill();
+        // 科幻：电路纹理
+        ctx.strokeStyle = 'rgba(80,200,255,.5)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(ex - e.size*0.5, ey); ctx.lineTo(ex + e.size*0.5, ey);
+        ctx.moveTo(ex, ey - e.size*0.5); ctx.lineTo(ex, ey + e.size*0.5);
+        ctx.stroke();
       }
-      // 血条
-      if (e.hp < e.maxHp){
+      // 眼睛
+      ctx.fillStyle = '#000';
+      ctx.beginPath(); ctx.arc(ex-3, ey-3, 2, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(ex+3, ey-3, 2, 0, Math.PI*2); ctx.fill();
+      // 精英/首领装饰
+      if (e.isElite){
+        ctx.strokeStyle = 'rgba(255,234,94,.9)';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.arc(ex, ey, e.size + 3 + Math.sin(e.auraPhase*4)*1.5, 0, Math.PI*2);
+        ctx.stroke();
+      } else if (e.isBoss){
+        ctx.strokeStyle = 'rgba(255,46,99,.9)';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(ex, ey, e.size + 6 + Math.sin(e.auraPhase*3)*3, 0, Math.PI*2);
+        ctx.stroke();
+        // 副光环
+        ctx.strokeStyle = 'rgba(255,234,94,.5)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(ex, ey, e.size + 12, 0, Math.PI*2);
+        ctx.stroke();
+      }
+      // 血条：精英与首领始终显示，普通怪受伤后显示
+      if (e.hp < e.maxHp || e.isElite || e.isBoss){
         const bw = e.size*2;
         ctx.fillStyle = 'rgba(0,0,0,.6)';
         ctx.fillRect(ex - bw/2, ey - e.size - 8, bw, 4);
-        ctx.fillStyle = e.isBoss ? '#ff2e63' : '#7ed957';
+        ctx.fillStyle = e.isBoss ? '#ff2e63' : (e.isElite ? '#ffea5e' : '#7ed957');
         ctx.fillRect(ex - bw/2, ey - e.size - 8, bw * (e.hp/e.maxHp), 4);
+      }
+      // 自爆倒计时：脉冲光圈预警（外圈 + 内圈）
+      if (e.attackType === 'suicide' && e.explodeTimer >= 0){
+        const pulse = 0.5 + 0.5 * Math.sin(G.realTime * 18);
+        const progress = 1 - e.explodeTimer; // 0→1 越接近爆炸越亮
+        // 外圈：扩张脉冲
+        ctx.strokeStyle = 'rgba(255,140,66,'+(0.55 + 0.35*pulse)+')';
+        ctx.lineWidth = 2 + pulse * 1.5;
+        ctx.beginPath();
+        ctx.arc(ex, ey, e.size + 8 + pulse * 5, 0, Math.PI*2);
+        ctx.stroke();
+        // 内圈：随倒计时收紧变红
+        ctx.strokeStyle = 'rgba(255,46,99,'+(0.5 + 0.4*progress)+')';
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        ctx.arc(ex, ey, e.size + 4 - progress * 1.5, 0, Math.PI*2);
+        ctx.stroke();
+      }
+      // 冲刺蓄力：收缩光圈（dashState=1 时）
+      if (e.attackType === 'dash' && e.dashState === 1){
+        const t = 1 - (e.dashTimer / 0.45); // 0→1
+        ctx.strokeStyle = 'rgba(255,107,157,'+(0.4 + 0.5*t)+')';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(ex, ey, e.size + 6 - t * 3, 0, Math.PI*2);
+        ctx.stroke();
       }
     }
 
@@ -873,11 +1904,55 @@
       const bx = b.x - camX, by = b.y - camY;
       ctx.fillStyle = '#ffe45e';
       ctx.shadowColor = '#ffaa44';
-      ctx.shadowBlur = 8;
+      ctx.shadowBlur = 10;
       ctx.beginPath();
       ctx.arc(bx, by, 4, 0, Math.PI*2);
       ctx.fill();
       ctx.shadowBlur = 0;
+    }
+    // 激光
+    for (const l of G.lasers){
+      const alpha = l.life / l.maxLife;
+      const x1 = l.x - camX, y1 = l.y - camY;
+      const x2 = l.x + l.dx*l.range - camX, y2 = l.y + l.dy*l.range - camY;
+      ctx.save();
+      ctx.strokeStyle = 'rgba(255,46,99,'+alpha+')';
+      ctx.lineWidth = l.width;
+      ctx.lineCap = 'round';
+      ctx.shadowColor = '#ff2e63';
+      ctx.shadowBlur = 18;
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+      ctx.strokeStyle = 'rgba(255,255,255,'+(alpha*0.7)+')';
+      ctx.lineWidth = l.width * 0.35;
+      ctx.shadowBlur = 0;
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+      ctx.restore();
+    }
+    // 敌方子弹
+    for (const b of G.enemyBullets){
+      const bx = b.x - camX, by = b.y - camY;
+      ctx.fillStyle = b.color;
+      ctx.shadowColor = b.color;
+      ctx.shadowBlur = 10;
+      ctx.beginPath();
+      ctx.arc(bx, by, b.size, 0, Math.PI*2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+      // 拖尾
+      ctx.strokeStyle = b.color;
+      ctx.globalAlpha = 0.35;
+      ctx.lineWidth = b.size * 0.8;
+      ctx.beginPath();
+      ctx.moveTo(bx - b.dx * b.size * 1.5, by - b.dy * b.size * 1.5);
+      ctx.lineTo(bx, by);
+      ctx.stroke();
+      ctx.globalAlpha = 1;
     }
 
     // 玩家
@@ -901,13 +1976,52 @@
         ctx.arc(px - Math.cos(p.facing)*10, py - Math.sin(p.facing)*10, p.size*0.7, 0, Math.PI*2);
         ctx.fill();
       }
-      // 身体
-      ctx.fillStyle = p.iframes > 0 && Math.floor(G.realTime*20)%2===0 ? '#9be7ff' : '#4be1ff';
-      ctx.strokeStyle = '#ffffff';
+      // 通用脉动（供身体、天罡 buff 共用，避免 iframes 分支未定义）
+      const pulse = 0.5 + 0.5 * Math.sin(G.realTime * 4);
+      // 金身光环 + 半透明身体（在身体外侧，不覆盖敌人）
+      if (p.iframes > 0){
+        const f = 0.5 + 0.5 * Math.sin(G.realTime * 14);
+        // 金身光环（外圈）
+        ctx.strokeStyle = 'rgba(155,231,255,'+(0.55+0.35*f)+')';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.arc(px, py, p.size + 3 + f * 2, 0, Math.PI*2);
+        ctx.stroke();
+        // 半透明身体（让底下的敌人能透出来）
+        ctx.globalAlpha = 0.45;
+        const grd = ctx.createRadialGradient(px-3, py-3, 2, px, py, p.size);
+        grd.addColorStop(0, '#bff0ff');
+        grd.addColorStop(1, '#7ad0ff');
+        ctx.fillStyle = grd;
+        ctx.beginPath();
+        ctx.arc(px, py, p.size, 0, Math.PI*2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+        // 蓝色描边让玩家轮廓更明显
+        ctx.strokeStyle = '#4be1ff';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.arc(px, py, p.size, 0, Math.PI*2);
+        ctx.stroke();
+      } else {
+        // 正常身体：双色主题（青 + 紫）
+        const grd = ctx.createRadialGradient(px-3, py-3, 2, px, py, p.size);
+        grd.addColorStop(0, '#9be7ff');
+        grd.addColorStop(1, '#6a3df0');
+        ctx.fillStyle = grd;
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(px, py, p.size, 0, Math.PI*2);
+        ctx.fill();
+        ctx.stroke();
+      }
+      // 剑型朝向
+      ctx.strokeStyle = '#ffe45e';
       ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.arc(px, py, p.size, 0, Math.PI*2);
-      ctx.fill();
+      ctx.moveTo(px + Math.cos(p.facing)*p.size, py + Math.sin(p.facing)*p.size);
+      ctx.lineTo(px + Math.cos(p.facing)*(p.size+8), py + Math.sin(p.facing)*(p.size+8));
       ctx.stroke();
       // 眼睛
       ctx.fillStyle = '#001';
@@ -915,6 +2029,14 @@
       ctx.arc(px + Math.cos(p.facing)*4 - 3, py + Math.sin(p.facing)*4 - 2, 2, 0, Math.PI*2);
       ctx.arc(px + Math.cos(p.facing)*4 + 3, py + Math.sin(p.facing)*4 - 2, 2, 0, Math.PI*2);
       ctx.fill();
+      // 天罡 buff 光
+      if (p.powerUpTime > 0){
+        ctx.strokeStyle = 'rgba(255,140,66,'+(0.5+0.3*pulse)+')';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(px, py, p.size+4+Math.sin(G.realTime*10)*1.5, 0, Math.PI*2);
+        ctx.stroke();
+      }
     }
 
     // 粒子
@@ -939,6 +2061,39 @@
     }
     ctx.globalAlpha = 1;
 
+    // 重叠在玩家身上的敌人重画一次（保证怪物可见，不被玩家身体完全遮挡）
+    if (p && G.enemies.length){
+      ctx.save();
+      for (const e of G.enemies){
+        const ex = e.x - camX, ey = e.y - camY;
+        // 只处理屏幕上一定范围的敌人
+        if (ex < -500 || ex > w+500 || ey < -500 || ey > h+500) continue;
+        const dx = p.x - e.x, dy = p.y - e.y;
+        const d = len(dx, dy);
+        // 当敌人与玩家重叠（小于视觉接触范围）时，画在玩家之上
+        if (d < e.size + p.size + 6){
+          // 描边
+          ctx.fillStyle = '#000';
+          ctx.beginPath();
+          ctx.arc(ex, ey, e.size + 1.5, 0, Math.PI*2);
+          ctx.fill();
+          // 身体
+          ctx.fillStyle = e.flash > 0 ? '#ffffff' : e.color;
+          ctx.beginPath();
+          ctx.arc(ex, ey, e.size, 0, Math.PI*2);
+          ctx.fill();
+          // 眼睛（突出显示）
+          ctx.fillStyle = '#fff';
+          ctx.beginPath(); ctx.arc(ex-3, ey-3, 2.5, 0, Math.PI*2); ctx.fill();
+          ctx.beginPath(); ctx.arc(ex+3, ey-3, 2.5, 0, Math.PI*2); ctx.fill();
+          ctx.fillStyle = '#000';
+          ctx.beginPath(); ctx.arc(ex-3, ey-3, 1.2, 0, Math.PI*2); ctx.fill();
+          ctx.beginPath(); ctx.arc(ex+3, ey-3, 1.2, 0, Math.PI*2); ctx.fill();
+        }
+      }
+      ctx.restore();
+    }
+
     ctx.restore();
   }
 
@@ -953,8 +2108,7 @@
       updatePlaying(dt);
       updateCamera();
       refreshHUD();
-    } else if (G.state === 'menu' || G.state === 'over' || G.state === 'paused' || G.state === 'levelup'){
-      // 仅做背景动画
+    } else if (G.state === 'menu' || G.state === 'over' || G.state === 'paused' || G.state === 'levelup' || G.state === 'treasure'){
       updateCamera();
     }
     render();
