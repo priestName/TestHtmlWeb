@@ -1,290 +1,670 @@
 <!DOCTYPE html>
-<html>
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<style>
-		html {
-			height:100%;
-			width:100%;
-			background-image: url(./beijing1.png);
-			margin:0px;
-			padding:0px;
-		}
-		  /* 屏幕宽度大于1000px */
-		  @media only screen and (min-width: 1000px) {
-			body {
-			  max-width: 800px;
-			  background-size: 840px 100% !important;
-			}
-		  }
-		  body {
-			  height:100%;
-			  margin: 0 auto;
-			  padding: 0 20px;
-			  background-image: url(./beijing-m.png);
-			  background-size:100% 100%;
-			  background-repeat: no-repeat;
-			  background-position:center;
-			}
-			p{
-			    margin: 10px 0;
-			}
-		</style>
-		<title>小六壬</title>
-	</head>
-	<body>
-		<div style="text-align: center;font-size: 48px;padding-top: 50px;">
-			<div id="riqi"></div>
-			<div id="jieguo"></div>
-		</div>
-		<div style="font-size: 24px;text-align: left;">
-			<div>
-				<label>占语：</label>
-				<p id="zhanyu"></p>
-			</div>
-			<div>
-				<label>口诀：</label>
-				<p id="koujue"></p>
-			</div>
-		</div>
-	</body>
-	<script>
-		
-		/**获取阴历 start*/
-		var nyear;
-		var nmonth;
-		var nday = -1;
-		var nwday;
-		var nhrs;
-		var nmin;
-		var nsec;
-		var lmonth, lday, lleap; //农历参数
-		var shichen;
-		function Draw() {
-			NewTick();
-			
-			//显示时间
-			var s = nyear + '年' + nmonth + '月' + nday + '日 ' + '星期' + cweekday(nwday) + ' ' + shapetime(nhrs, nmin, nsec);
-			s += " 农历" + lmonth + "月" + lday; //农历
-			var lunar_month_day=lmonth + "月" + lday;
-			//需要展示在页面地方
-			console.log("农历日期---",lunar_month_day);
-			let shi = shichenStr[shichen] + "时";
-			console.log("时辰---",shi + "时");
-			
-			document.getElementById("riqi").innerText = lunar_month_day + shi
-		}
-		
-		
-		function NewTick() {
-			let noww = new Date();
-			nhrs = noww.getHours();
-			nmin = noww.getMinutes();
-			nsec = noww.getSeconds();
-			
-			if (noww.getDate() != nday) {
-				nyear = noww.getFullYear();
-				nmonth = noww.getMonth() + 1;
-				nwday = noww.getDay();
-				nday = noww.getDate();
-				getlunar(); //获取农历
-			}
-		}
-		
-		
-		//辅助函数
-		var hzWeek = new Array("星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日");
-		function cweekday(wday) {
-			console.log('星期---',hzWeek[wday]);
-		}
-		function shapetime(vhrs, vmin, vsec) {
-			if (vsec <= 9) vsec = "0" + vsec;
-			if (vmin <= 9) vmin = "0" + vmin;
-			if (vhrs <= 9) vhrs = "0" + vhrs;
-			// return vhrs + ":" + vmin + ":" + vsec
-			console.log("时间日期---",vhrs + ":" + vmin + ":" + vsec);
-		}
-		
-		//阴历函数开始
-		var lunarInfo = new Array(0x04bd8, 0x04ae0, 0x0a570, 0x054d5, 0x0d260, 0x0d950, 0x16554, 0x056a0, 0x09ad0, 0x055d2, 0x04ae0, 0x0a5b6, 0x0a4d0, 0x0d250, 0x1d255, 0x0b540, 0x0d6a0, 0x0ada2, 0x095b0, 0x14977, 0x04970, 0x0a4b0, 0x0b4b5, 0x06a50, 0x06d40, 0x1ab54, 0x02b60, 0x09570, 0x052f2, 0x04970, 0x06566, 0x0d4a0, 0x0ea50, 0x06e95, 0x05ad0, 0x02b60, 0x186e3, 0x092e0, 0x1c8d7, 0x0c950, 0x0d4a0, 0x1d8a6, 0x0b550, 0x056a0, 0x1a5b4, 0x025d0, 0x092d0, 0x0d2b2, 0x0a950, 0x0b557, 0x06ca0, 0x0b550, 0x15355, 0x04da0, 0x0a5b0, 0x14573, 0x052b0, 0x0a9a8, 0x0e950, 0x06aa0, 0x0aea6, 0x0ab50, 0x04b60, 0x0aae4, 0x0a570, 0x05260, 0x0f263, 0x0d950, 0x05b57, 0x056a0, 0x096d0, 0x04dd5, 0x04ad0, 0x0a4d0, 0x0d4d4, 0x0d250, 0x0d558, 0x0b540, 0x0b6a0, 0x195a6, 0x095b0, 0x049b0, 0x0a974, 0x0a4b0, 0x0b27a, 0x06a50, 0x06d40, 0x0af46, 0x0ab60, 0x09570, 0x04af5, 0x04970, 0x064b0, 0x074a3, 0x0ea50, 0x06b58, 0x05ac0, 0x0ab60, 0x096d5, 0x092e0, //1990
-			0x0c960, 0x0d954, 0x0d4a0, 0x0da50, 0x07552, 0x056a0, 0x0abb7, 0x025d0, 0x092d0, 0x0cab5, 0x0a950, 0x0b4a0, 0x0baa4, 0x0ad50, 0x055d9, 0x04ba0, 0x0a5b0, 0x15176, 0x052b0, 0x0a930, 0x07954, 0x06aa0, 0x0ad50, 0x05b52, 0x04b60, 0x0a6e6, 0x0a4e0, 0x0d260, 0x0ea65, 0x0d530, 0x05aa0, 0x076a3, 0x096d0, 0x04bd7, 0x04ad0, 0x0a4d0, 0x1d0b6, 0x0d250, 0x0d520, 0x0dd45, 0x0b5a0, 0x056d0, 0x055b2, 0x049b0, 0x0a577, 0x0a4b0, 0x0aa50, 0x1b255, 0x06d20, 0x0ada0, 0x14b63);
-		function lYearDays(y) {
-			var i, sum = 348;
-			for (i = 0x8000; i > 0x8; i >>= 1) sum += (lunarInfo[y - 1900] & i) ? 1 : 0;
-			return (sum + leapDays(y));
-		}
-		function leapDays(y) {
-			if (leapMonth(y)) return ((lunarInfo[y - 1900] & 0x10000) ? 30 : 29);
-			else return (0);
-		}
-		function leapMonth(y) {
-			return (lunarInfo[y - 1900] & 0xf);
-		}
-		function monthDays(y, m) {
-			return ((lunarInfo[y - 1900] & (0x10000 >> m)) ? 30 : 29);
-		}
-		function Lunar(y, m, d) {
-			var i, leap = 0,
-				temp = 0;
-			var offset = (Date.UTC(y, m, d) - Date.UTC(1900, 0, 31)) / 86400000;
-			for (i = 1900; i < 2050 && offset > 0; i++) {
-				temp = lYearDays(i);
-				offset -= temp;
-			}
-			if (offset < 0) {
-				offset += temp;
-				i--;
-			}
-			this.year = i;
-			leap = leapMonth(i);
-			this.isLeap = false;
-			for (i = 1; i < 13 && offset > 0; i++) {
-				if (leap > 0 && i == (leap + 1) && this.isLeap == false) {--i;
-					this.isLeap = true;
-					temp = leapDays(this.year);
-				} else {
-					temp = monthDays(this.year, i);
-				}
-				if (this.isLeap == true && i == (leap + 1)) this.isLeap = false;
-				offset -= temp;
-			}
-			if (offset == 0 && leap > 0 && i == leap + 1) if (this.isLeap) {
-				this.isLeap = false;
-			} else {
-				this.isLeap = true; --i;
-			}
-			if (offset < 0) {
-				offset += temp; --i;
-			}
-			this.month = i;
-			this.day = offset + 1;
-		}
-		var nStr1 = new Array('', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '十一', '十二');
-		var nStr2 = new Array('初', '十', '廿', '卅', '□');
-		var shichenStr = new Array("子","丑","寅","卯","辰","巳","午","未","申","酉","戌","亥");
-		function GetcDay(d) {
-			var s;
-			switch (d) {
-				case 10:
-					s = '初十';
-					break;
-				case 20:
-					s = '二十';
-					break;
-				case 30:
-					s = '三十';
-					break;
-				default:
-					s = nStr2[Math.floor(d / 10)];
-					s += nStr1[d % 10];
-					break;
-			}
-			return (s);
-		}
-		function GetcMon(m) {
-			if (m == 1) return '正';
-			else return nStr1[m];
-		}
-		function GetShiChen(){
-			switch(nhrs)
-			{
-				case 23:
-				case 0:
-					return 0;
-				case 1:
-				case 2:
-					return 1;
-				case 3:
-				case 4:
-					return 2;
-				case 5:
-				case 6:
-					return 3;
-				case 7:
-				case 8:
-					return 4;
-				case 9:
-				case 10:
-					return 5;
-				case 11:
-				case 12:
-					return 6;
-				case 13:
-				case 14:
-					return 7;
-				case 15:
-				case 16:
-					return 8;
-				case 17:
-				case 18:
-					return 9;
-				case 19:
-				case 20:
-					return 10;
-				case 21:
-				case 22:
-					return 11;
-				default:
-					return undefined;
-					break;
-			}
-		}
-		function getlunar() {
-			var lObj = new Lunar(nyear, nmonth - 1, nday);
-			lmonth = GetcMon(lObj.month);
-			lday = GetcDay(lObj.day);
-			lleap = lObj.isLeap;
-			if (lleap == 1) {
-				lmonth = "闰" + lmonth;
-			}
-			shichen = GetShiChen()
-			liuren(lObj);
-		}
-		var liurenStr = [
-			{
-				title:"大安",
-				zhanyu:"身不动时，五行属木，颜色青色，方位东方。临青龙，谋事主一、五、七。有静止、心安。吉祥之含义。",
-				koujue:"大安事事昌，求财在坤方，失物去不远，宅舍保安康，行人身未动，病者主无妨。将军回田野，仔细与推详，丢失在附近，可能西南向，安居得吉日，不可动身祥。办事别出屋，求借邀自房，得病凶化吉，久疾得安康，寻人知音信，可能归村庄。口舌能消散，远行要提防，交易别出村，离屯细推详，求财有八分，得全不出房。",
-			},
-			{
-				title:"留连",
-				zhanyu:"人未归时，五行属水，颜色黑色，方位北方，临玄武，凡谋事主二、八、十(卯午子)。有喑味不明，延迟。纠缠、拖延之含义。",
-				koujue:"留连事未当，求事日莫光，凡事只宜缓，去者未回向，失物南方去，急急行便访。紧记防口舌，人口且平祥，丢失难寻找，窃者又转场，出行定不归，久去拖延长。办事不果断，牵连又返往，求借不易成，被求而彷徨，此日患疾病，几天不复康。找人迷雾中，迷迷又恍惚，口舌继续有，拖拉又伸长，女方嫁吉日，求财六分量。",
-			},
-			{
-				title:"速喜",
-				zhanyu:"人即至时，五行属火，颜色红色方位南方，临朱雀，谋事主三，六，九(辰戌未)。有快速、喜庆，吉利含义，时机已到。",
-				koujue:"速喜喜临乡，求财往南方，失物申午未，逢人路寻详，官事有福德，病者无大伤。六畜田稼庆，行人有音向，丢失得音信，微乐在面上，出行遇吉利，小喜而顺当。办事如逢春，吉利又荣光，小量可求借，大事难全强，久病见小愈，得病速回康，寻人得知见，口舌见消亡，交易可得成，但不太久长，求财有十分，吉时得顺当。",
-			},
-			{
-				title:"赤口",
-				zhanyu:"官事凶时，五行属金，颜色白色，方位西方，临白虎，谋事主四、七，十。有不吉、惊恐，凶险、 口舌是非之含义。",
-				koujue:"赤口主口伤，官事且紧防，失物急去找，行人有惊慌，鸡犬多作怪，病者上西方。更须防咒咀，恐怕染瘟殃，找物犯谎口，寻问无音向，出门千口怨，言谈万骂伤。办事犯口舌，难成有阻挡，求借不全顺，闭口无事张，得病千口猜，求医还无妨。寻人得凶音，人心不安详，口舌犯最重，交易口舌防，求财只四分，逢吉才成当。",
-			},
-			{
-				title:"小吉",
-				zhanyu:"人来喜时，五行属木，临六合，凡谋事主一、五、七有和合、吉利之含义。",
-				koujue:"小吉最吉昌，路上好商量，阴人来报喜，失物在坤方，行人立刻至，交易甚是强。凡事皆合好，病者保安康，大吉又大顺，万事如意详，出行可得喜，千里吉安详。诸事可心顺，有忧皆消光，求借自来助，众友愿相帮，重病莫要愁，久病得安康。不见得相见，不打自归庄，千人称赞君，无限上荣光，交易成兴隆，十二分财量.",
-			},
-			{
-				title:"空亡",
-				zhanyu:"音信稀时，五行属土，颜色黄色，方位中央;临勾陈。谋事主三、六、九(辰未丑)。 有不吉、无结果、忧虑之含义。",
-				koujue:"空亡事不长，阴人无主张，求财心白费，行人有灾殃，失物永不见，官事有刑伤。病人遇邪鬼，久病添祸殃，失物难找见，找寻空荡荡，出行不吉利，凶多不吉祥。办事凶为多，处处有阻挡，求借不能成，成事化败伤，得病凶多噩，久患雪加霜。寻人无音信，知音变空想，万口都诽骂，小舟遭狂浪，求财有二分，不吉不利亡",
-			},
-		];
-		function liuren(lObj) {
-			let i = lObj.month + lObj.day + shichen + 1 - 2
-			i%=6
-			if(i == 0)i = 6;
-			let a = liurenStr[i-1]
-			document.getElementById("jieguo").innerText = a.title
-			document.getElementById("zhanyu").innerText = a.zhanyu
-			document.getElementById("koujue").innerText = a.koujue
-			
-		}
-		//阴历函数结束
-		Draw();
-		/**获取阴历 end*/
-	</script>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小六壬</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #1A1410;
+            --gold-accent: #D4A574;
+            --date-label: #8B7355;
+            --date-value: #C4A882;
+            --result-name: #F2E6D0;
+            --element-base: #83A480;
+            --element-bg: rgba(131, 164, 128, 0.15);
+            --card-bg: rgba(255, 255, 255, 0.04);
+            --card-border: rgba(212, 165, 116, 0.2);
+            --card-label: #D4A574;
+            --content-zhanyu: #C4B99A;
+            --content-koujue: #A89880;
+            --btn-gradient-start: #B88C56;
+            --btn-gradient-end: #997342;
+            --btn-text: #1A1410;
+            --footer-text: #5A5040;
+            --font-family: 'Noto Serif SC', 'Source Han Serif CN', 'SimSun', serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+            background: var(--bg-primary);
+            font-family: var(--font-family);
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+        }
+
+        /* ====== 页面容器 ====== */
+        .page {
+            width: 100%;
+            max-width: 390px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 48px 28px 40px 28px;
+            gap: 0;
+        }
+
+        /* ====== 顶部装饰线 ====== */
+        .decorative-line {
+            width: 48px;
+            height: 2px;
+            background: var(--gold-accent);
+            border-radius: 1px;
+            flex-shrink: 0;
+        }
+
+        /* ====== 日期区域 ====== */
+        .date-section {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            padding: 24px 0 36px 0;
+        }
+
+        .date-label {
+            font-size: 14px;
+            font-weight: 400;
+            color: var(--date-label);
+            text-align: center;
+            line-height: 1.43;
+        }
+
+        .date-value {
+            font-size: 18px;
+            font-weight: 500;
+            color: var(--date-value);
+            text-align: center;
+            letter-spacing: 2px;
+            line-height: 1.44;
+        }
+
+        /* ====== 分隔点 ====== */
+        .divider-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--gold-accent);
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        /* ====== 结果区域 ====== */
+        .result-area {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .result-name {
+            font-size: 56px;
+            font-weight: 700;
+            color: var(--result-name);
+            text-align: center;
+            line-height: 72px;
+            letter-spacing: 8px;
+        }
+
+        .element-tag {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            padding: 4px 14px;
+            background: var(--element-bg);
+            border-radius: 10px;
+            width: fit-content;
+        }
+
+        .element-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--element-base);
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .element-text {
+            font-size: 13px;
+            font-weight: 400;
+            color: var(--element-base);
+            line-height: 1.46;
+        }
+
+        /* ====== 间距 ====== */
+        .spacer {
+            width: 100%;
+            height: 48px;
+            flex-shrink: 0;
+        }
+
+        /* ====== 卡片容器 ====== */
+        .cards-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* ====== 卡片 ====== */
+        .card {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+        }
+
+        .card-header {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-icon {
+            width: 4px;
+            height: 16px;
+            background: var(--card-label);
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+
+        .card-label {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--card-label);
+            line-height: 1.44;
+        }
+
+        .card-content-zhanyu {
+            font-size: 15px;
+            font-weight: 400;
+            color: var(--content-zhanyu);
+            line-height: 26px;
+            text-align: left;
+        }
+
+        .card-content-koujue {
+            font-size: 14px;
+            font-weight: 400;
+            color: var(--content-koujue);
+            line-height: 24px;
+            text-align: left;
+        }
+
+        /* ====== 三宫综断 ====== */
+        .palace-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .palace {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 12px 4px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+        }
+
+        .palace-key {
+            font-size: 12px;
+            font-weight: 400;
+            color: var(--date-label);
+            line-height: 1.4;
+        }
+
+        .palace-val {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--result-name);
+            line-height: 1.4;
+        }
+
+        /* ====== 宜忌 · 五行 ====== */
+        .meta-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .meta-chip {
+            font-size: 12px;
+            font-weight: 400;
+            color: var(--content-koujue);
+            padding: 3px 10px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            line-height: 1.5;
+        }
+
+        .yiji {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 2px;
+        }
+
+        .yiji-row {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .yiji-key {
+            font-size: 13px;
+            font-weight: 600;
+            flex-shrink: 0;
+            min-width: 20px;
+            text-align: center;
+            border-radius: 4px;
+            padding: 1px 0;
+            line-height: 1.6;
+        }
+
+        .yiji-key.yi { color: #83A480; }
+        .yiji-key.ji { color: #C4545A; }
+
+        .yiji-val {
+            font-size: 14px;
+            font-weight: 400;
+            color: var(--content-zhanyu);
+            line-height: 22px;
+        }
+
+        /* ====== 按钮区域 ====== */
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 0 0 0;
+        }
+
+        .refresh-button {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 32px;
+            background: linear-gradient(180deg, var(--btn-gradient-start) 0%, var(--btn-gradient-end) 100%);
+            border: none;
+            border-radius: 24px;
+            cursor: pointer;
+            font-family: var(--font-family);
+            transition: opacity 0.2s ease;
+        }
+
+        .refresh-button:hover {
+            opacity: 0.9;
+        }
+
+        .refresh-button:active {
+            opacity: 0.8;
+        }
+
+        .refresh-icon {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+        }
+
+        .button-text {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--btn-text);
+            line-height: 1.47;
+        }
+
+        .footer-text {
+            font-size: 12px;
+            font-weight: 400;
+            color: var(--footer-text);
+            text-align: center;
+            line-height: 1.42;
+        }
+    </style>
+</head>
+<body>
+    <div class="page" id="page">
+        <!-- 顶部装饰线 -->
+        <div class="decorative-line"></div>
+
+        <!-- 日期区域 -->
+        <div class="date-section">
+            <div class="date-label">农历</div>
+            <div class="date-value" id="riqi"></div>
+        </div>
+
+        <!-- 分隔点 -->
+        <div class="divider-dot"></div>
+
+        <!-- 结果区域 -->
+        <div class="result-area">
+            <div class="result-name" id="jieguo"></div>
+            <div class="element-tag" id="elementTag">
+                <div class="element-dot"></div>
+                <div class="element-text" id="elementInfo"></div>
+            </div>
+        </div>
+
+        <!-- 间距 -->
+        <div class="spacer"></div>
+
+        <!-- 卡片区域 -->
+        <div class="cards-container">
+            <!-- 占语卡片 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon"></div>
+                    <div class="card-label">占语</div>
+                </div>
+                <div class="card-content-zhanyu" id="zhanyu"></div>
+            </div>
+
+            <!-- 口诀卡片 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon"></div>
+                    <div class="card-label">口诀</div>
+                </div>
+                <div class="card-content-koujue" id="koujue"></div>
+            </div>
+
+            <!-- 三宫综断卡片 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon"></div>
+                    <div class="card-label">三宫综断</div>
+                </div>
+                <div class="palace-row">
+                    <div class="palace">
+                        <span class="palace-key">起因 · 月</span>
+                        <span class="palace-val" id="tianVal">—</span>
+                    </div>
+                    <div class="palace">
+                        <span class="palace-key">过程 · 日</span>
+                        <span class="palace-val" id="diVal">—</span>
+                    </div>
+                    <div class="palace">
+                        <span class="palace-key">结局 · 时</span>
+                        <span class="palace-val" id="renVal">—</span>
+                    </div>
+                </div>
+                <div class="card-content-zhanyu" id="shengke" style="margin-top: 12px;"></div>
+            </div>
+
+            <!-- 宜忌 · 五行卡片 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon"></div>
+                    <div class="card-label">宜忌 · 五行</div>
+                </div>
+                <div class="meta-row" id="metaRow"></div>
+                <div class="yiji">
+                    <div class="yiji-row">
+                        <span class="yiji-key yi">宜</span>
+                        <span class="yiji-val" id="yiVal"></span>
+                    </div>
+                    <div class="yiji-row">
+                        <span class="yiji-key ji">忌</span>
+                        <span class="yiji-val" id="jiVal"></span>
+                    </div>
+                </div>
+                <div class="card-content-zhanyu" id="zonghe" style="margin-top: 12px;"></div>
+            </div>
+
+            <!-- 按钮区域 -->
+            <div class="button-container">
+                <button class="refresh-button" onclick="location.reload()">
+                    <svg class="refresh-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M21.5 2V8H15.5" stroke="#1A1410" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M2.5 12C2.5 17.5228 6.97715 22 12.5 22C18.0228 22 22.5 17.5228 22.5 12C22.5 9.4087 21.5489 7.03441 19.5 5.5" stroke="#1A1410" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M2.5 12C2.5 6.47715 6.97715 2 12.5 2C14.8 2 16.9 2.7 18.6 3.9" stroke="#1A1410" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    <span class="button-text">重新起卦</span>
+                </button>
+                <div class="footer-text">每日更新 · 仅供参考 · 不可尽信</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /**获取阴历 start*/
+        var nyear;
+        var nmonth;
+        var nday = -1;
+        var nwday;
+        var nhrs;
+        var nmin;
+        var nsec;
+        var lmonth, lday, lleap;
+        var shichen;
+
+        function Draw() {
+            NewTick();
+            var s = nyear + '年' + nmonth + '月' + nday + '日 ' + '星期' + cweekday(nwday) + ' ' + shapetime(nhrs, nmin, nsec);
+            s += " 农历" + lmonth + "月" + lday;
+            var lunar_month_day = lmonth + "月" + lday;
+            let shi = shichenStr[shichen] + "时";
+            document.getElementById("riqi").innerText = lunar_month_day + " · " + shi;
+        }
+
+        function NewTick() {
+            let noww = new Date();
+            nhrs = noww.getHours();
+            nmin = noww.getMinutes();
+            nsec = noww.getSeconds();
+            if (noww.getDate() != nday) {
+                nyear = noww.getFullYear();
+                nmonth = noww.getMonth() + 1;
+                nwday = noww.getDay();
+                nday = noww.getDate();
+                getlunar();
+            }
+        }
+
+        var hzWeek = new Array("星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日");
+        function cweekday(wday) { return hzWeek[wday]; }
+        function shapetime(vhrs, vmin, vsec) { return ""; }
+
+        // 阴历函数
+        var lunarInfo = new Array(0x04bd8, 0x04ae0, 0x0a570, 0x054d5, 0x0d260, 0x0d950, 0x16554, 0x056a0, 0x09ad0, 0x055d2, 0x04ae0, 0x0a5b6, 0x0a4d0, 0x0d250, 0x1d255, 0x0b540, 0x0d6a0, 0x0ada2, 0x095b0, 0x14977, 0x04970, 0x0a4b0, 0x0b4b5, 0x06a50, 0x06d40, 0x1ab54, 0x02b60, 0x09570, 0x052f2, 0x04970, 0x06566, 0x0d4a0, 0x0ea50, 0x06e95, 0x05ad0, 0x02b60, 0x186e3, 0x092e0, 0x1c8d7, 0x0c950, 0x0d4a0, 0x1d8a6, 0x0b550, 0x056a0, 0x1a5b4, 0x025d0, 0x092d0, 0x0d2b2, 0x0a950, 0x0b557, 0x06ca0, 0x0b550, 0x15355, 0x04da0, 0x0a5b0, 0x14573, 0x052b0, 0x0a9a8, 0x0e950, 0x06aa0, 0x0aea6, 0x0ab50, 0x04b60, 0x0aae4, 0x0a570, 0x05260, 0x0f263, 0x0d950, 0x05b57, 0x056a0, 0x096d0, 0x04dd5, 0x04ad0, 0x0a4d0, 0x0d4d4, 0x0d250, 0x0d558, 0x0b540, 0x0b6a0, 0x195a6, 0x095b0, 0x049b0, 0x0a974, 0x0a4b0, 0x0b27a, 0x06a50, 0x06d40, 0x0af46, 0x0ab60, 0x09570, 0x04af5, 0x04970, 0x064b0, 0x074a3, 0x0ea50, 0x06b58, 0x05ac0, 0x0ab60, 0x096d5, 0x092e0,
+            0x0c960, 0x0d954, 0x0d4a0, 0x0da50, 0x07552, 0x056a0, 0x0abb7, 0x025d0, 0x092d0, 0x0cab5, 0x0a950, 0x0b4a0, 0x0baa4, 0x0ad50, 0x055d9, 0x04ba0, 0x0a5b0, 0x15176, 0x052b0, 0x0a930, 0x07954, 0x06aa0, 0x0ad50, 0x05b52, 0x04b60, 0x0a6e6, 0x0a4e0, 0x0d260, 0x0ea65, 0x0d530, 0x05aa0, 0x076a3, 0x096d0, 0x04bd7, 0x04ad0, 0x0a4d0, 0x1d0b6, 0x0d250, 0x0d520, 0x0dd45, 0x0b5a0, 0x056d0, 0x055b2, 0x049b0, 0x0a577, 0x0a4b0, 0x0aa50, 0x1b255, 0x06d20, 0x0ada0, 0x14b63);
+        function lYearDays(y) { var i, sum = 348; for (i = 0x8000; i > 0x8; i >>= 1) sum += (lunarInfo[y - 1900] & i) ? 1 : 0; return (sum + leapDays(y)); }
+        function leapDays(y) { if (leapMonth(y)) return ((lunarInfo[y - 1900] & 0x10000) ? 30 : 29); else return (0); }
+        function leapMonth(y) { return (lunarInfo[y - 1900] & 0xf); }
+        function monthDays(y, m) { return ((lunarInfo[y - 1900] & (0x10000 >> m)) ? 30 : 29); }
+        function Lunar(y, m, d) { var i, leap = 0, temp = 0; var offset = (Date.UTC(y, m, d) - Date.UTC(1900, 0, 31)) / 86400000; for (i = 1900; i < 2050 && offset > 0; i++) { temp = lYearDays(i); offset -= temp; } if (offset < 0) { offset += temp; i--; } this.year = i; leap = leapMonth(i); this.isLeap = false; for (i = 1; i < 13 && offset > 0; i++) { if (leap > 0 && i == (leap + 1) && this.isLeap == false) { --i; this.isLeap = true; temp = leapDays(this.year); } else { temp = monthDays(this.year, i); } if (this.isLeap == true && i == (leap + 1)) this.isLeap = false; offset -= temp; } if (offset == 0 && leap > 0 && i == leap + 1) if (this.isLeap) { this.isLeap = false; } else { this.isLeap = true; --i; } if (offset < 0) { offset += temp; --i; } this.month = i; this.day = offset + 1; }
+        var nStr1 = new Array('', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '十一', '十二');
+        var nStr2 = new Array('初', '十', '廿', '卅', '□');
+        var shichenStr = new Array("子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥");
+        function GetcDay(d) { var s; switch (d) { case 10: s = '初十'; break; case 20: s = '二十'; break; case 30: s = '三十'; break; default: s = nStr2[Math.floor(d / 10)]; s += nStr1[d % 10]; break; } return (s); }
+        function GetcMon(m) { if (m == 1) return '正'; else return nStr1[m]; }
+        function GetShiChen() { switch (nhrs) { case 23: case 0: return 0; case 1: case 2: return 1; case 3: case 4: return 2; case 5: case 6: return 3; case 7: case 8: return 4; case 9: case 10: return 5; case 11: case 12: return 6; case 13: case 14: return 7; case 15: case 16: return 8; case 17: case 18: return 9; case 19: case 20: return 10; case 21: case 22: return 11; default: return undefined; } }
+        function getlunar() { var lObj = new Lunar(nyear, nmonth - 1, nday); lmonth = GetcMon(lObj.month); lday = GetcDay(lObj.day); lleap = lObj.isLeap; if (lleap == 1) { lmonth = "闰" + lmonth; } shichen = GetShiChen(); liuren(lObj); }
+
+        // 六壬结果数据 - 含五行 / 神煞 / 方位 / 数字 / 宜忌 / 综合解读 / 主题色
+        var liurenStr = [
+            {
+                title: "大安", wuxing: "木", shensha: "青龙", fangwei: "东方", shu: "一、五、七", level: "大吉",
+                element: "五行属木 · 青龙",
+                zhanyu: "身不动时，五行属木，颜色青色，方位东方。临青龙，谋事主一、五、七。有静止、心安。吉祥之含义。",
+                koujue: "大安事事昌，求财在坤方，失物去不远，宅舍保安康，行人身未动，病者主无妨。将军回田野，仔细与推详，丢失在附近，可能西南向，安居得吉日，不可动身祥。办事别出屋，求借邀自房，得病凶化吉，久疾得安康，寻人知音信，可能归村庄。口舌能消散，远行要提防，交易别出村，离屯细推详，求财有八分，得全不出房。",
+                yi: "守成静守、出行平安、求财守旧、问病无妨、谋事可成",
+                ji: "躁进扩张、仓促变动、大额冒险、强出头",
+                zonghe: "静卦也，宜静不宜动。凡事安稳可成，然进展和缓，贵在守常；春月木旺，其力更彰。问财可守不宜攻，问事宜缓不宜急。",
+                theme: { base: '#83A480', bg: 'rgba(131,164,128,0.15)' }
+            },
+            {
+                title: "留连", wuxing: "水", shensha: "玄武", fangwei: "北方", shu: "二、八、十", level: "平凶",
+                element: "五行属水 · 玄武",
+                zhanyu: "人未归时，五行属水，颜色黑色，方位北方，临玄武，凡谋事主二、八、十(卯午子)。有喑味不明，延迟。纠缠、拖延之含义。",
+                koujue: "留连事未当，求事日莫光，凡事只宜缓，去者未回向，失物南方去，急急行便访。紧记防口舌，人口且平祥，丢失难寻找，窃者又转场，出行定不归，久去拖延长。办事不果断，牵连又返往，求借不易成，被求而彷徨，此日患疾病，几天不复康。找人迷雾中，迷迷又恍惚，口舌继续有，拖拉又伸长，女方嫁吉日，求财六分量。",
+                yi: "缓办守旧、以拖化事、等待时机、暗中筹备",
+                ji: "急于落地、远行、大动作、口舌争执",
+                zonghe: "迟滞之卦，事多纠缠反复。非不成，乃晚成；冬月水旺其势更显。宜以“拖”字诀养势待时，切忌强行推进，反招是非。",
+                theme: { base: '#6B8FA3', bg: 'rgba(107,143,163,0.15)' }
+            },
+            {
+                title: "速喜", wuxing: "火", shensha: "朱雀", fangwei: "南方", shu: "三、六、九", level: "上吉",
+                element: "五行属火 · 朱雀",
+                zhanyu: "人即至时，五行属火，颜色红色方位南方，临朱雀，谋事主三，六，九(辰戌未)。有快速、喜庆，吉利含义，时机已到。",
+                koujue: "速喜喜临乡，求财往南方，失物申午未，逢人路寻详，官事有福德，病者无大伤。六畜田稼庆，行人有音向，丢失得音信，微乐在面上，出行遇吉利，小喜而顺当。办事如逢春，吉利又荣光，小量可求借，大事难全强，久病见小愈，得病速回康，寻人得知见，口舌见消亡，交易可得成，但不太久长，求财有十分，吉时得顺当。",
+                yi: "主动出击、沟通联络、求财向南、速决速行",
+                ji: "拖延犹豫、坐失时机、恋栈不去",
+                zonghe: "喜神速至，消息立应。火性炎上，主迅速得喜；然火年须防“幻火”，得财宜速脱手、莫久恋。夏月火旺更验，凡事趁热打铁为上。",
+                theme: { base: '#C4545A', bg: 'rgba(196,84,90,0.15)' }
+            },
+            {
+                title: "赤口", wuxing: "金", shensha: "白虎", fangwei: "西方", shu: "四、七、十", level: "凶",
+                element: "五行属金 · 白虎",
+                zhanyu: "官事凶时，五行属金，颜色白色，方位西方，临白虎，谋事主四、七，十。有不吉、惊恐，凶险、 口舌是非之含义。",
+                koujue: "赤口主口伤，官事且紧防，失物急去找，行人有惊慌，鸡犬多作怪，病者上西方。更须防咒咀，恐怕染瘟殃，找物犯谎口，寻问无音向，出门千口怨，言谈万骂伤。办事犯口舌，难成有阻挡，求借不全顺，闭口无事张，得病千口猜，求医还无妨。寻人得凶音，人心不安详，口舌犯最重，交易口舌防，求财只四分，逢吉才成当。",
+                yi: "谨言慎行、文书核对、武职粗活、以柔克刚",
+                ji: "签约立约、争吵诉讼、远行、大额合作",
+                zonghe: "口舌之卦，官非破财之象。金性刚锐，易起争端；金弱之岁（如火年）赤口之灾易发，宜以柔克刚、以静制动，闭口则无事。",
+                theme: { base: '#C4A882', bg: 'rgba(196,168,130,0.15)' }
+            },
+            {
+                title: "小吉", wuxing: "木", shensha: "六合", fangwei: "东方", shu: "一、五、七", level: "次吉",
+                element: "五行属木 · 六合",
+                zhanyu: "人来喜时，五行属木，临六合，凡谋事主一、五、七有和合、吉利之含义。",
+                koujue: "小吉最吉昌，路上好商量，阴人来报喜，失物在坤方，行人立刻至，交易甚是强。凡事皆合好，病者保安康，大吉又大顺，万事如意详，出行可得喜，千里吉安详。诸事可心顺，有忧皆消光，求借自来助，众友愿相帮，重病莫要愁，久病得安康。不见得相见，不打自归庄，千人称赞君，无限上荣光，交易成兴隆，十二分财量.",
+                yi: "出行访友、沟通交易、合作和合、因人得财",
+                ji: "贪大求全、独断专行、轻率变更",
+                zonghe: "和合之卦，木德敷荣。不如大安之稳、速喜之速，而介于其间，徐徐得吉。六合主人事和合，多因他人之助而成；春月木旺尤利。",
+                theme: { base: '#83A480', bg: 'rgba(131,164,128,0.15)' }
+            },
+            {
+                title: "空亡", wuxing: "土", shensha: "勾陈", fangwei: "中央", shu: "三、六、九", level: "大凶",
+                element: "五行属土 · 勾陈",
+                zhanyu: "音信稀时，五行属土，颜色黄色，方位中央;临勾陈。谋事主三、六、九(辰未丑)。 有不吉、无结果、忧虑之含义。",
+                koujue: "空亡事不长，阴人无主张，求财心白费，行人有灾殃，失物永不见，官事有刑伤。病人遇邪鬼，久病添祸殃，失物难找见，找寻空荡荡，出行不吉利，凶多不吉祥。办事凶为多，处处有阻挡，求借不能成，成事化败伤，得病凶多噩，久患雪加霜。寻人无音信，知音变空想，万口都诽骂，小舟遭狂浪，求财有二分，不吉不利亡",
+                yi: "保守守旧、不妄动、多听人言、静以待变",
+                ji: "投钱下注、签约立约、寻人求职、远行妄动",
+                zonghe: "落空之卦，事多虚妄无果。土性晦藏，主消散；事主犹豫不决时，宜广听人言、切勿率断。秋冬土金当令，其虚更甚，凡事以退守为安。",
+                theme: { base: '#B49B5C', bg: 'rgba(180,155,92,0.15)' }
+            },
+        ];
+
+        // 阴阳属性（用于三宫平衡判断）
+        var yinyang = { "大安": "阳", "速喜": "阳", "小吉": "阳", "留连": "阴", "赤口": "阴", "空亡": "阴" };
+
+        function findGod(title) {
+            for (var i = 0; i < liurenStr.length; i++) {
+                if (liurenStr[i].title === title) return liurenStr[i];
+            }
+            return null;
+        }
+
+        // 五行生克关系
+        function wuxingRelation(a, b) {
+            var sheng = { "木": "火", "火": "土", "土": "金", "金": "水", "水": "木" };
+            var ke = { "木": "土", "土": "水", "水": "火", "火": "金", "金": "木" };
+            if (sheng[a] === b) return "生";
+            if (ke[a] === b) return "克";
+            if (sheng[b] === a) return "被生";
+            if (ke[b] === a) return "被克";
+            return "比和";
+        }
+
+        // 三宫五行生克综断
+        function buildSynthesis(tianT, diT, renT) {
+            var td = wuxingRelation(findGod(tianT).wuxing, findGod(diT).wuxing);
+            var dr = wuxingRelation(findGod(diT).wuxing, findGod(renT).wuxing);
+            var word = { "生": "相生", "被生": "受生", "克": "相克", "被克": "被克", "比和": "比和" };
+            var tone = {
+                "生": "得生助，运势顺进",
+                "被生": "获外力相扶",
+                "克": "遭制约，途中多阻",
+                "被克": "被克制，须防损耗",
+                "比和": "气场稳固同心"
+            };
+            var s = "起因【" + tianT + "】" + word[td] + "过程【" + diT + "】，"
+                + tone[td] + "；过程【" + diT + "】" + word[dr] + "结局【" + renT + "】，" + tone[dr] + "。";
+            var ys = [yinyang[tianT], yinyang[diT], yinyang[renT]];
+            if (ys[0] === "阳" && ys[1] === "阳" && ys[2] === "阳") {
+                s += "三宫皆阳，事态偏于激进，当防过刚则折。";
+            } else if (ys[0] === "阴" && ys[1] === "阴" && ys[2] === "阴") {
+                s += "三宫皆阴，阴霾密布，须防暗箭与反复。";
+            }
+            return s;
+        }
+
+        // 正统小六壬：月上起日、日上起时（分步顺数）
+        // 月宫 = (月-1)%6；日宫 = (月宫+日-1)%6；时宫 = (日宫+时辰-1)%6（0基索引，时辰取 1-12）
+        function liuren(lObj) {
+            var m = lObj.month;            // 农历月 1-12
+            var d = lObj.day;              // 农历日 1-30
+            var s = shichen + 1;           // 时辰 1-12（子=1 … 亥=12）
+
+            var tian = ((m - 1) % 6 + 6) % 6;          // 天宫（起因）
+            var di = ((tian + d - 1) % 6 + 6) % 6;      // 地宫（过程）
+            var ren = ((di + s - 1) % 6 + 6) % 6;       // 人宫（结局，即最终卦象）
+
+            var a = liurenStr[ren];
+
+            document.getElementById("jieguo").innerText = a.title;
+            document.getElementById("zhanyu").innerText = a.zhanyu;
+            document.getElementById("koujue").innerText = a.koujue;
+            document.getElementById("elementInfo").innerText = a.element;
+
+            // 三宫综断
+            document.getElementById("tianVal").innerText = liurenStr[tian].title;
+            document.getElementById("diVal").innerText = liurenStr[di].title;
+            var renValEl = document.getElementById("renVal");
+            renValEl.innerText = liurenStr[ren].title;
+            renValEl.style.color = a.theme.base;
+            document.getElementById("shengke").innerText =
+                buildSynthesis(liurenStr[tian].title, liurenStr[di].title, liurenStr[ren].title);
+
+            // 宜忌 · 五行
+            var meta = document.getElementById("metaRow");
+            meta.innerHTML = "";
+            var chips = ["五行 " + a.wuxing, "神煞 " + a.shensha, "方位 " + a.fangwei, "数 " + a.shu, "等级 " + a.level];
+            for (var i = 0; i < chips.length; i++) {
+                var sp = document.createElement("span");
+                sp.className = "meta-chip";
+                sp.innerText = chips[i];
+                meta.appendChild(sp);
+            }
+            document.getElementById("yiVal").innerText = a.yi;
+            document.getElementById("jiVal").innerText = a.ji;
+            document.getElementById("zonghe").innerText = a.zonghe;
+
+            // 根据结果切换元素配色
+            var root = document.documentElement;
+            root.style.setProperty('--element-base', a.theme.base);
+            root.style.setProperty('--element-bg', a.theme.bg);
+        }
+
+        Draw();
+        /**获取阴历 end*/
+    </script>
+</body>
 </html>
