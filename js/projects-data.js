@@ -1,0 +1,45 @@
+/**
+ * Priest 个人主页 - 项目数据
+ * 通过 <script> 标签加载（兼容 file:// 本地直接打开）
+ * 数据源与 projects.json 保持一致
+ */
+window.PROJECTS = [
+  {
+    "title": "彩票随机生成器",
+    "desc": "快速生成随机彩票号码的小工具",
+    "url": "caipiao.html",
+    "linkText": "caipiao.html",
+    "gradient": "lottery",
+    "aiTag": "AI 随机算法"
+  },
+  {
+    "title": "易经大乐透生成器",
+    "desc": "基于易经六十四卦的乐透号码生成工具",
+    "url": "yjcaipiao.html",
+    "linkText": "yjcaipiao.html",
+    "gradient": "yijing",
+    "aiTag": "AI 卦象解析"
+  },
+  {
+    "title": "小六壬占卜",
+    "desc": "传统小六壬占卜法的网页实现",
+    "url": "xiaoliuren.html",
+    "linkText": "xiaoliuren.html",
+    "gradient": "liuren"
+  },
+  {
+    "title": "圣诞树动画",
+    "desc": "CSS 绘制的动态圣诞树，节日氛围满满",
+    "url": "Christmas_tree.html",
+    "linkText": "Christmas_tree.html",
+    "gradient": "xmas"
+  },
+  {
+    "title": "Roguelike 小游戏",
+    "desc": "一款简易的 Roguelike 地牢探索网页游戏",
+    "url": "roguelike/index.html",
+    "linkText": "roguelike/index.html",
+    "gradient": "roguelike",
+    "aiTag": "AI 关卡生成"
+  }
+];
