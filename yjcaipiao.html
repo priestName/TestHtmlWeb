@@ -1,145 +1,480 @@
 <!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>易经大乐透生成器</title>
-    <style>
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: 20px auto; padding: 20px; }
-        @media (max-width: 600px) {
-            body { padding: 10px; }
-            .yao-line { font-size: 18px; }
-            button { width: 100%; padding: 15px; }
-        }
-        .hexagram-box { border: 2px solid #4CAF50; padding: 20px; border-radius: 10px; margin: 20px 0; }
-        .yao-line { font-size: 24px; margin: 5px 0; }
-        .numbers { font-size: 18px; color: #2196F3; }
-        button { padding: 12px 24px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; }
-        button:hover { background: #45a049; }
-    </style>
+<html data-page-node-id="sqPRKLDknVb6KPrvHIDm6s" lang="zh-CN">
+<head data-page-node-id="Sh1rAVzPuZzsVyuxB8I7vN">
+<script data-page-node-id="BuOSlHtOtKFeyxrqEheclb" src="/page/page_comm/inject.js"></script>
+<meta data-page-node-id="6r8JrqiBnxmFaCNN1KpGs8" charset="UTF-8">
+<meta data-page-node-id="0bL3srfnpB1HgHyS0gCZF6" content="width=device-width, initial-scale=1.0" name="viewport">
+<title data-page-node-id="aSVGD1tQVU3z2O8Wb9Sd0H" data-pnid-children="MhRMZ08pvd1nA6mmLkuuAl">易经大乐透 · I-Ching Daletou</title>
+<link data-page-node-id="sfU9apiUUib5czhNocpa1n" href="https://fonts.googleapis.com" rel="preconnect">
+<link data-page-node-id="RYpl3gPNOOeBlETPIHk0Qx" crossorigin href="https://fonts.gstatic.com" rel="preconnect">
+<link data-page-node-id="8AhHKY5zr1vY0LWPq1umtp" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Noto+Serif+SC:wght@500;700&display=swap" rel="stylesheet">
+<style data-page-node-id="6FRkhShGBW3pN7B8pHCgGM" data-pnid-children="vLfo9pGE9ycCQq0i4ry08K">
+  :root{
+    --bg-0:#05070f;
+    --bg-1:#0a1226;
+    --glass:rgba(20,32,64,0.45);
+    --glass-border:rgba(96,150,255,0.25);
+    --accent:#5b9bff;
+    --accent-2:#7be0ff;
+    --gold:#ffd479;
+    --text:#eaf1ff;
+    --muted:#8ea3c8;
+    --front:#ff6b6b;   /* 前区 红球 */
+    --back:#5b9bff;    /* 后区 蓝球 */
+    --change:#ff7ad9;  /* 变爻 */
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:"Instrument Sans","Noto Serif SC",-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+    color:var(--text);
+    background:
+      radial-gradient(1200px 700px at 18% -8%, rgba(64,120,255,0.20), transparent 60%),
+      radial-gradient(900px 600px at 92% 8%, rgba(120,80,255,0.16), transparent 55%),
+      radial-gradient(800px 800px at 50% 120%, rgba(40,200,255,0.10), transparent 60%),
+      linear-gradient(160deg,var(--bg-1),var(--bg-0));
+    min-height:100vh;
+    padding:32px 18px 60px;
+    overflow-x:hidden;
+  }
+  .wrap{max-width:1080px;margin:0 auto}
+  header{text-align:center;margin-bottom:26px}
+  .kicker{
+    display:inline-block;letter-spacing:.32em;font-size:12px;text-transform:uppercase;
+    color:var(--accent-2);border:1px solid var(--glass-border);border-radius:999px;
+    padding:5px 14px;background:var(--glass);backdrop-filter:blur(8px);margin-bottom:14px;
+  }
+  h1{
+    font-family:"Noto Serif SC",serif;font-weight:700;font-size:clamp(30px,6vw,52px);
+    background:linear-gradient(180deg,#fff,var(--accent-2));-webkit-background-clip:text;background-clip:text;color:transparent;
+    text-shadow:0 0 38px rgba(91,155,255,0.25);
+  }
+  .sub{color:var(--muted);margin-top:10px;font-size:14px;line-height:1.6}
+  .sub b{color:var(--gold);font-weight:600}
+
+  .grid{display:grid;grid-template-columns:1.05fr 1fr;gap:22px;align-items:start}
+  @media(max-width:860px){.grid{grid-template-columns:1fr}}
+
+  .card{
+    background:var(--glass);border:1px solid var(--glass-border);border-radius:22px;
+    padding:24px;backdrop-filter:blur(16px);box-shadow:0 24px 60px rgba(0,0,0,0.45),inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+  .card h2{font-size:15px;font-weight:600;letter-spacing:.04em;color:var(--accent-2);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+  .card h2::before{content:"";width:8px;height:8px;border-radius:2px;background:var(--accent);box-shadow:0 0 12px var(--accent)}
+
+  /* 卦象爻图 */
+  .hexagram{display:flex;flex-direction:column-reverse;gap:9px;align-items:center;margin:6px 0 18px;min-height:236px;justify-content:center}
+  .yao{display:flex;align-items:center;gap:12px;width:100%;justify-content:center;opacity:0;transform:translateY(14px);animation:rise .45s ease forwards}
+  @keyframes rise{to{opacity:1;transform:none}}
+  .yao .line{display:flex;gap:10px}
+  .yao .yang{width:74px;height:9px;border-radius:3px;background:linear-gradient(90deg,#9fc4ff,#5b9bff);box-shadow:0 0 10px rgba(91,155,255,.5)}
+  .yao .yin{width:32px;height:9px;border-radius:3px;background:linear-gradient(90deg,#9fc4ff,#5b9bff)}
+  .yao.changing .yang,.yao.changing .yin{box-shadow:0 0 14px var(--change);outline:1.5px solid var(--change)}
+  .yao .tag{font-size:13px;color:var(--muted);min-width:38px;text-align:right;font-variant-numeric:tabular-nums}
+  .yao.changing .tag{color:var(--change)}
+  .yao .coins{font-size:11px;color:var(--muted);min-width:64px;letter-spacing:.05em}
+  .yao.changing .coins{color:var(--change)}
+
+  .gua-info{display:flex;gap:14px;margin-bottom:6px}
+  .gua-box{flex:1;background:rgba(8,14,30,0.55);border:1px solid var(--glass-border);border-radius:14px;padding:12px 14px;text-align:center}
+  .gua-box .label{font-size:11px;color:var(--muted);letter-spacing:.1em}
+  .gua-box .name{font-family:"Noto Serif SC",serif;font-size:20px;font-weight:700;margin:4px 0;color:#fff}
+  .gua-box .judge{font-size:12px;color:var(--gold);line-height:1.5;min-height:34px}
+
+  .meta{font-size:12px;color:var(--muted);margin-top:10px;line-height:1.7;border-top:1px dashed var(--glass-border);padding-top:10px}
+  .meta code{color:var(--accent-2);font-variant-numeric:tabular-nums}
+
+  /* 号码球 */
+  .balls{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin:14px 0 6px}
+  .ball{
+    width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:24px;font-weight:700;font-variant-numeric:tabular-nums;color:#fff;
+    background:radial-gradient(circle at 32% 28%,rgba(255,255,255,.35),transparent 55%),var(--front);
+    box-shadow:0 8px 22px rgba(255,90,90,.30),inset 0 1px 2px rgba(255,255,255,.4);
+    animation:pop .4s cubic-bezier(.2,1.4,.4,1) backwards;
+  }
+  .ball.back{background:radial-gradient(circle at 32% 28%,rgba(255,255,255,.35),transparent 55%),var(--back);box-shadow:0 8px 22px rgba(91,155,255,.35),inset 0 1px 2px rgba(255,255,255,.4)}
+  @keyframes pop{from{transform:scale(0) rotate(-30deg);opacity:0}to{transform:none;opacity:1}}
+  .zone-label{text-align:center;font-size:12px;color:var(--muted);letter-spacing:.18em;margin-top:8px}
+  .zone-label b{color:#fff;font-weight:600}
+
+  .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+  button{
+    font-family:inherit;font-size:14px;font-weight:600;color:#fff;cursor:pointer;border:none;border-radius:12px;
+    padding:12px 18px;background:linear-gradient(135deg,#3b6fe0,#5b9bff);box-shadow:0 10px 26px rgba(59,111,224,.40);
+    transition:transform .12s ease,box-shadow .12s ease;
+  }
+  button:hover{transform:translateY(-2px);box-shadow:0 14px 32px rgba(59,111,224,.55)}
+  button:active{transform:translateY(0)}
+  button.ghost{background:transparent;border:1px solid var(--glass-border);box-shadow:none;color:var(--text)}
+  button.ghost:hover{border-color:var(--accent);background:rgba(91,155,255,.10)}
+
+  /* 意念参数输入 */
+  .intent{margin-top:16px}
+  .intent label{display:block;font-size:12px;color:var(--muted);margin-bottom:7px;letter-spacing:.04em}
+  .intent input{width:100%;padding:11px 14px;border-radius:12px;border:1px solid var(--glass-border);background:rgba(8,14,30,0.55);color:var(--text);font-family:inherit;font-size:14px;outline:none;transition:.15s}
+  .intent input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(91,155,255,.18)}
+  .intent input::placeholder{color:#5d7099}
+
+  /* 历史 */
+  .history{max-height:340px;overflow:auto;margin-top:4px;display:flex;flex-direction:column;gap:10px}
+  .hist-item{background:rgba(8,14,30,0.5);border:1px solid var(--glass-border);border-radius:12px;padding:10px 12px;font-size:12px}
+  .hist-item .top{display:flex;justify-content:space-between;color:var(--muted);margin-bottom:6px}
+  .hist-item .gua{font-family:"Noto Serif SC",serif;color:var(--gold);font-weight:700}
+  .hist-item .nums{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+  .mini{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;background:var(--front)}
+  .mini.back{background:var(--back)}
+  .hist-empty{color:var(--muted);font-size:13px;text-align:center;padding:24px 0}
+  .clear{margin-top:10px;font-size:12px}
+
+  details{margin-top:22px;background:var(--glass);border:1px solid var(--glass-border);border-radius:16px;padding:14px 18px}
+  details summary{cursor:pointer;color:var(--accent-2);font-weight:600;font-size:14px;outline:none}
+  details p{color:var(--muted);font-size:13px;line-height:1.8;margin-top:10px}
+  details code{color:var(--accent-2)}
+
+  /* 免责提示条 */
+  .disclaimer{margin-top:14px;font-size:12px;line-height:1.7;color:var(--gold);
+    background:rgba(255,212,121,0.07);border:1px solid rgba(255,212,121,0.28);border-radius:12px;padding:10px 13px}
+  .disclaimer b{color:#ffe1a3;font-weight:700}
+
+  /* 吉祥话 / 签语 */
+  .blessing{margin-top:16px;text-align:center;font-family:"Noto Serif SC",serif;font-size:19px;font-weight:700;letter-spacing:.06em;
+    background:linear-gradient(180deg,#fff4d6,#ffd479);-webkit-background-clip:text;background-clip:text;color:transparent;
+    text-shadow:0 0 26px rgba(255,212,121,.22);min-height:26px;transition:.3s}
+  .blessing::before{content:"卜曰 · ";-webkit-text-fill-color:var(--accent-2);color:var(--accent-2);font-size:13px;font-weight:600;letter-spacing:.1em}
+
+  .toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%) translateY(20px);background:rgba(10,18,38,.95);border:1px solid var(--glass-border);color:#fff;padding:12px 22px;border-radius:999px;font-size:14px;opacity:0;pointer-events:none;transition:.3s;box-shadow:0 12px 30px rgba(0,0,0,.5);z-index:50}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  footer{text-align:center;color:var(--muted);font-size:12px;margin-top:34px;line-height:1.7}
+  footer b{color:var(--gold)}
+</style>
 </head>
-<body>
-    <h1>易经大乐透号码生成器</h1>
-    <button onclick="generateNew()">点击生成新卦象</button>
-    
-    <div id="resultContainer">
-        <!-- 动态内容将由JavaScript填充 -->
+<body data-page-node-id="z9J0VIHddDnGJrsqBXKW8f">
+<div data-page-node-id="LQi8X1bGfHWg6qaK5zv31N" class="wrap">
+  <header data-page-node-id="EQn7ZA2KubP4QKTSgGJKsK">
+    <span data-page-node-id="waHhXvpDu3ZAjubrqvBvOg" class="kicker"><!--pnid:LqAlEBKfTwNLigUvRUtkiK-->I-Ching · Daletou</span>
+    <h1 data-page-node-id="75Py9YXhwHQKy3Q3ggZrBv"><!--pnid:doTQ6ltZpUEijDPcFI76hi-->易经大乐透</h1>
+    <p data-page-node-id="gtQlYalxtsPaehgHPflTnf" class="sub"><!--pnid:u08GhuJ4rpQIJ2bflv7ir4-->三枚铜钱，六爻成卦 —— 以<b data-page-node-id="8dNtBro6JyUG7gy9TnPxUH"><!--pnid:3gSL9IJYGeN6faJ5bRUNpm-->本卦定数、变爻化机</b><!--pnid:vgisVQVTrdpa73eent34Op-->，推演体彩大乐透一注。<br data-page-node-id="ECukl8i3cAVXg9bSnwJbif"><!--pnid:Db1HvfZU5QMJnaymXKZ4RJ-->纯前端推演，仅供娱乐，理性购彩，不中奖概不负责 😉</p>
+  </header>
+
+  <div data-page-node-id="UOR76E2eP59HR2xhoezbQR" class="grid">
+    <!--pnid:ouLx3ZZqVdvAPUvwxHIjJX--><!-- 左：卦象 -->
+    <section data-page-node-id="fGqoH2BtOGWrlUAR3l6PjO" class="card">
+      <h2 data-page-node-id="PnkJ9EGGIOf5e6Z0G9sv3p"><!--pnid:eYRDuoY7fK0j8p5opKxIJv-->卜卦 · 金钱卦</h2>
+      <div data-page-node-id="SA7wITlbohINcEM0RQ5ozu" class="hexagram" id="hexagram"></div>
+      <div data-page-node-id="tJ8YXxMPQxRbIcsVYIdWPS" class="gua-info">
+        <div data-page-node-id="VKg5D84jFqsGF9ZMmHDoRy" class="gua-box">
+          <div data-page-node-id="K491OyMU764vE6J22QLO5I" class="label"><!--pnid:VV9cP7n78a4jZbPYPac8IO-->本卦</div>
+          <div data-page-node-id="U2aSoMTa5icOzL9oOk4NUk" class="name" id="benName"><!--pnid:JEQzMvprpH7ECYjOdK2nud-->—</div>
+          <div data-page-node-id="Ia0GOYnVCzgbeXBXo4AVaJ" class="judge" id="benJudge"></div>
+        </div>
+        <div data-page-node-id="h49UNrDexBod4VNrzCO9S9" class="gua-box">
+          <div data-page-node-id="YiD8QB5ATfhfZ7ONk5zBhF" class="label"><!--pnid:wo1DWU9RI7Xq7fh2I3gT5B-->之卦（变后）</div>
+          <div data-page-node-id="y6RxVsk7vICYf8hT7uVWs8" class="name" id="zhName"><!--pnid:2wfNZPGTLcfwPWYqTqfcIt-->—</div>
+          <div data-page-node-id="IlceKa4uPq2jtggcs9IzGK" class="judge" id="zhJudge"></div>
+        </div>
+      </div>
+      <div data-page-node-id="lYlcrZcDRdoIPOUAznsAUG" class="intent">
+        <label data-page-node-id="k3cLvqRCRobALDc31GWTKh" for="intentInput"><!--pnid:glgSKkY9Trzrpl6XE9uBQk-->求测事项 / 幸运数字（可选，留空亦可）</label>
+        <input data-page-node-id="XxHlSRV4NAon8VkEQtJaLr" autocomplete="off" id="intentInput" maxlength="40" placeholder="例如：888、发财、今日运势……" type="text">
+      </div>
+      <div data-page-node-id="j6F27NURsiezUTN9dz54zs" class="meta" id="meta"><!--pnid:YO4F5fQKg1Aj1EP0VpfaRE-->点击「起卦」开始演算……</div>
+      <div data-page-node-id="nBg1dSCsYEIHcAuDg5drQK" class="disclaimer"><!--pnid:KvFxsEvLcQ5jHXWP2zKXT3-->⚠️ 本号码由 <b data-page-node-id="DcWoJFAjcF1e4M1TbryFUq"><!--pnid:UGebHa2zmJBG4WDeVrg4Iq-->卦象算法生成</b><!--pnid:WrrefQ7wJDLYXZZP6MJSpM-->，仅供娱乐。<b data-page-node-id="KD42soG8AWxz8wyHqO5gcF"><!--pnid:3d7Lsuq0rCL2gVnp3YdKRC-->大乐透开奖完全随机，不构成任何购彩建议</b><!--pnid:7TiaZePbR2gXemZNARyOal-->，请理性投注、量力而行。</div>
+      <div data-page-node-id="c1sVyfexsEfIijpusQmXlk" class="actions">
+        <button data-page-node-id="FcDmLyQRtAzjp8CA2cVtN9" id="castBtn"><!--pnid:rYPJtX3AwFMMBztk4llKVq-->🪙 起卦推演</button>
+        <button data-page-node-id="5VpCWn0hGs6mhhSKrj1wXT" class="ghost" id="copyBtn"><!--pnid:mhneV5qQ0zV1isCnbELg9K-->复制号码</button>
+      </div>
+    </section>
+
+    <!--pnid:lAUaGC6lM19IvdwhJ9Xhnw--><!-- 右：号码 -->
+    <section data-page-node-id="zXrHKiGfXcHIVEuqLkrM6Z" class="card">
+      <h2 data-page-node-id="6gdKI3TpPOGRvTCxzvfhGr"><!--pnid:qpFqYPHuXhSAr7HGVcJV3x-->大乐透 · 一注</h2>
+      <div data-page-node-id="OnP9tcjqlRdWvunkvVuZRR" class="zone-label"><!--pnid:MHQ44kKTApjZImRY0gLf4j-->前区 <b data-page-node-id="qfDd5ts4BQpDCNgqCUb7hH"><!--pnid:SjtLDitkNLk9fxEBn6iLo9-->5/35</b><!--pnid:lXOrnpKLQFUedOWj2J6CHd-->（红球）</div>
+      <div data-page-node-id="QiuEbpp9pkVgMMEjuUY55K" class="balls" id="frontBalls"></div>
+      <div data-page-node-id="80m2iz33jyh9WwrZx3mRGJ" class="zone-label" style="margin-top:18px"><!--pnid:g5y2321sbdVGAKJDPt5gTU-->后区 <b data-page-node-id="4j78wzB9mJpmNra39t4CJz"><!--pnid:vnm4qzr5tvjn6Re4ZZP6nq-->2/12</b><!--pnid:cV69fhfy3Pis8EyWCgO5oy-->（蓝球）</div>
+      <div data-page-node-id="KherTiuADfJVcywc9LkLFA" class="balls" id="backBalls"></div>
+      <div data-page-node-id="V8cJuafWHoVs6iV2z7p2C6" class="meta" id="numMeta" style="border-top:none; padding-top:14px"><!--pnid:5Ptq2EmmGwEbIwPuEd6Fdm-->卦象既成，号码随显。</div>
+      <div data-page-node-id="8MUedaCmbEHuG6o9JMGDCg" class="blessing" id="blessing"><!--pnid:Rm6fnU4Eac0Rf9I8PyyGxY-->心诚则灵，福至心灵 ✦</div>
+    </section>
+  </div>
+
+  <!--pnid:k80M6HzEi6wjkfV0QuVieZ--><!-- 历史 -->
+  <section data-page-node-id="EvFOcQGmhB3mqRk784ajjk" class="card" style="margin-top:22px">
+    <h2 data-page-node-id="zQ5ixGUUMNQbNub59Hjkbs"><!--pnid:Uu17bOChHqNDNWfni5Ewv4-->卜卦记录</h2>
+    <div data-page-node-id="QJTUdqpX7BdvXvItvmqwpg" class="history" id="history"></div>
+    <div data-page-node-id="NRKy1z3zF0xDQ8BabmljHs" class="actions clear">
+      <button data-page-node-id="ccUcrdZIsAY0t2eJBYHSnY" class="ghost" id="clearBtn"><!--pnid:IChUDdME8xMWLCQ8xsaZnd-->清空记录</button>
     </div>
+  </section>
 
-    <script>
-        const trigramMap = {
-            '111': ['乾', '天行健'],
-            '000': ['坤', '地势坤'],
-            '101': ['离', '明两作'],
-            '010': ['坎', '水洊至'],
-            '110': ['巽', '随风巽'],
-            '001': ['震', '洊雷震'],
-            '100': ['艮', '兼山艮'],
-            '011': ['兑', '丽泽兑']
-        };
+  <details data-page-node-id="3J07FE1jRJ59JLGyYWfL0P">
+    <summary data-page-node-id="pXWasCKLo26MvpSIArSZ3X"><!--pnid:o05CIgiZzmciForiDphoeM-->📜 这号码是怎么来的？（演算原理）</summary>
+    <p data-page-node-id="5OHhcxVQNLGlzKHGSyruQz"><!--pnid:dFexVDhEywLkNMOzSdGjjh-->
+      采用传统<b data-page-node-id="zUoD5BWp8UuhZNGnBM9g65"><!--pnid:xRIcSX8ilk9WpC0zABL59T-->金钱卦</b><!--pnid:ul1rj6oHxB6oVH8ILvxgPF-->：三枚铜钱掷六次，背面多者为阳。每掷结果：三背=老阳(9)、两背一字=少阳(7)、两字一背=少阴(8)、三字=老阴(6)。<br data-page-node-id="fap32g4shFWiHQt7GaLpca"><!--pnid:V3TrGhAvloEbKbEEgXWamR-->
+      阳爻记作 <code data-page-node-id="Zyl0m4WWtcxsupMGT6MRgs"><!--pnid:jMRaVXvcvTVV2k4TzlxSz0-->1</code><!--pnid:aRmJlJq4GjYcOwBl0rwpMo-->、阴爻记作 <code data-page-node-id="0BPur3C91Za1kKXIVQri2r"><!--pnid:lDEms6hiKOK8VJKxEMo6h7-->0</code><!--pnid:uZj3qAl89WR0SxrJFUbscZ-->，自初爻至上爻串成 6 位二进制，即为<b data-page-node-id="qENbeQCMwtlfN6wt6WHu1n"><!--pnid:FbG7b4VRCJw8b3tzawxgFd-->本卦</b><!--pnid:KYu2MKTIEYd6ZYEydm2h6p-->；老阳老阴为变爻，阴阳互转得<b data-page-node-id="nVarXTUakGi1m9Ps8Ce8B8"><!--pnid:dhB1lyODhaKo7uWxcUmBgJ-->之卦</b><!--pnid:Is9USexaU55ZQgl8bVLDbB-->。<br data-page-node-id="SBUEqrVLKJ1fA1P5OlefFG"><!--pnid:1ikD5cMAFUL0DraSzdzvcX-->
+      将「本卦串 + 之卦串」做字符串哈希，喂入 <code data-page-node-id="kcvADL62cKxAGvMUIRHxxg"><!--pnid:PmCi3mhytlXlGuN79XuauG-->mulberry32</code><!--pnid:6BdWMwLmVifZWexZvNgSRC--> 伪随机发生器，对 <code data-page-node-id="24bOwVIMi1Ph6X8pCSrsd8"><!--pnid:SO5PBWqgFe4cBXGqSw0eI0-->1–35</code><!--pnid:YlO2DiHsxiwQblAqPYD5pq--> 洗牌取前 5 为前区、对 <code data-page-node-id="34s0Z1Q6ikAWDnFiPqnBQD"><!--pnid:WIs7eV2TmFBYoB9TpkFkAW-->1–12</code><!--pnid:Ei4Jho6rVNG7KcRt8FzpjY--> 洗牌取前 2 为后区。<br data-page-node-id="EemW0YcMyiiZm0EH0kVaBH"><!--pnid:Vt6zGzMkafA2y4IvQ460Aw-->
+      如此<b data-page-node-id="tHghHPqZVQPICigiY18Yiu"><!--pnid:J5dHd4EmYyu9KabkL4DR7T-->同一卦象必得同注号码</b><!--pnid:LPUJtxiFiwhG8kHSbzcpnb-->（命定），不同卦象则不同 —— 谓之「卦定其数，随机其中」。<br data-page-node-id="SrfKpA9Ac1Y5txcuZ7yTVK"><!--pnid:eGn2oBplcSot8hoJA45pHF-->
+      若填入<b data-page-node-id="APA0eWNxVx9nFlR0LVNz7u"><!--pnid:Wi4g47AOxLeb5LyHuYIfNa-->求测事项 / 幸运数字</b><!--pnid:8h2XrjoJGLsGjoS2MYVrvM-->，其哈希将作为「意念盐」并入种子：同一卦象下不同输入对应不同号码，使一念一卦皆可参与推演；留空则纯依天意。
+    </p>
+  </details>
 
-        const yaoDict = {
-            1: { 阳: '初九：潜龙勿用', 阴: '初六：履霜坚冰至' },
-            2: { 阳: '九二：见龙在田', 阴: '六二：直方大不习' },
-            3: { 阳: '九三：君子终日乾乾', 阴: '六三：含章可贞' },
-            4: { 阳: '九四：或跃在渊', 阴: '六四：括囊无咎' },
-            5: { 阳: '九五：飞龙在天', 阴: '六五：黄裳元吉' },
-            6: { 阳: '上九：亢龙有悔', 阴: '上六：龙战于野' }
-        };
+  <footer data-page-node-id="8lMmvj3Sdcj0PMQzPHN3oZ"><!--pnid:D01xQPUN07JdImj71yfajn-->
+    本程序为<b data-page-node-id="q5d8HcjEE3qdJ1cRMFkrlt"><!--pnid:HxP5l9aNjoZyZOJj79P4FK-->创意编程 / 传统文化趣味</b><!--pnid:oNZUySJtyaE5qiRur9tuen-->作品，所有号码均由<b data-page-node-id="xFh4DU7vt89JXVwDkS4RyK"><!--pnid:1ppQHRv7SrnOXoBSXSfzFV-->卦象算法生成</b><!--pnid:L2gaFluYuBYxsH8vUN4Ixj-->，仅供娱乐，<b data-page-node-id="93OnFxyL5BCGVw2MomfonA"><!--pnid:ttz2zBgCUkZZREz4x34FeE-->不构成任何购彩建议</b><!--pnid:OaAE4RcV7B3iGIGRFQLqmV-->。<br data-page-node-id="h5lLcwUTGFH78BKDR7MDzB"><!--pnid:DQrbamcRDloLtqgTsZM4dx-->
+    大乐透开奖完全随机，中奖概率极低，请理性购彩、量力而行。愿君 <b data-page-node-id="JFVhmqdwWhiMid3b8Qs2vI"><!--pnid:NaQAlfpsEuImULz3dyvDlu-->福至心灵</b><!--pnid:oclndgnCYbTFUxC7HWTuZm-->，得失随缘，平安是福。
+  </footer>
+</div>
 
-        function generateHexagram() {
-            return Array.from({length:6}, () => Math.random() > 0.5 ? '阳' : '阴');
-        }
+<div data-page-node-id="cE5tLGCkEU4JBG0kypcS8i" class="toast" id="toast"></div>
 
-        function parseHexagram(hexagram) {
-            const lower = hexagram.slice(0,3).map(yao => yao === '阳' ? 1 : 0);
-            const upper = hexagram.slice(3).map(yao => yao === '阳' ? 1 : 0);
-            
-            const lowerKey = lower.join('');
-            const upperKey = upper.join('');
-            
-            const lowerTrigram = trigramMap[lowerKey] || ['未知卦', '卦象未收录'];
-            const upperTrigram = trigramMap[upperKey] || ['未知卦', '卦象未收录'];
-            
-            // 构建爻辞解释
-            const yaoDetails = hexagram.map((yao, index) => 
-                `${['初','二','三','四','五','上'][index]}${yao === '阳' ? '九' : '六'}: ${yaoDict[index+1][yao]}`
-            );
-            
-            // 吉凶判断
-            const yangCount = hexagram.filter(yao => yao === '阳').length;
-            const luckLevel = ['大凶','凶','平','吉','大吉'][yangCount % 5];
-            
-            return {
-                hexagramDisplay: hexagram.join(' '),
-                lowerTrigram: lowerTrigram,
-                upperTrigram: upperTrigram,
-                yaoDetails: yaoDetails,
-                luck: luckLevel
-            };
-        }
+<script data-page-node-id="INMf0G7JN0Gd4773nbDCod" data-pnid-children="fmtr5amMAdbd6hdlrUUTCy">
+/* ============ 64 卦表（初→上，阳1阴0） ============ */
+const GUA = {
+  "111111":"乾为天|刚健中正，自强不息",
+  "000000":"坤为地|厚德载物，顺天承时",
+  "100010":"水雷屯|万物始生，艰难中进",
+  "010001":"山水蒙|启蒙养正，循序而学",
+  "111010":"水天需|待时而动，饮食宴乐",
+  "010111":"天水讼|争讼宜止，慎防口舌",
+  "010000":"地水师|兵众以律，用师贵正",
+  "000010":"水地比|亲比相辅，择善而从",
+  "111011":"风天小畜|小有蓄积，待时而发",
+  "110111":"天泽履|履危而安，谨慎前行",
+  "111000":"地天泰|天地交泰，通达和顺",
+  "000111":"天地否|闭塞不通，否极泰来",
+  "101111":"天火同人|同声相应，和同于人",
+  "111101":"火天大有|富有之日，顺天休命",
+  "001000":"地山谦|谦尊而光，谦谦君子",
+  "000100":"雷地豫|欢愉顺动，备豫不怠",
+  "100110":"泽雷随|随时而动，从善如流",
+  "011001":"山风蛊|整治积弊，拨乱反正",
+  "110000":"地泽临|临下以亲，教化渐施",
+  "000011":"风地观|观风察俗，省方设教",
+  "100101":"火雷噬嗑|刚柔交击，去梗通滞",
+  "101001":"山火贲|文饰适度，质美形彰",
+  "000001":"山地剥|剥落将尽，顺止待复",
+  "100000":"地雷复|一阳来复，生机重启",
+  "100111":"天雷无妄|至诚无妄，顺天不妄",
+  "111001":"山天大畜|大畜其德，厚积厚发",
+  "100001":"山雷颐|颐养之道，慎言节食",
+  "011110":"泽风大过|非常之时，独立不惧",
+  "010010":"坎为水|重险在前，维心亨通",
+  "101101":"离为火|附丽光明，明照四方",
+  "001110":"泽山咸|感应相与，柔上刚下",
+  "011100":"雷风恒|恒久不已，立不易方",
+  "001111":"天山遁|退避保身，与时偕行",
+  "111100":"雷天大壮|阳刚壮盛，非礼弗履",
+  "000101":"火地晋|进而昭明，自晦而升",
+  "101000":"地火明夷|韬光守正，处难待明",
+  "101011":"风火家人|齐家有序，以内为本",
+  "110101":"火泽睽|乖离求合，异中求同",
+  "001010":"水山蹇|见险而止，反身修德",
+  "010100":"雷水解|险难消解，舒解从容",
+  "110001":"山泽损|损下益上，损益有节",
+  "100011":"风雷益|损上益下，与时偕行",
+  "111110":"泽天夬|决而能和，刚断柔承",
+  "011111":"天风姤|不期而遇，勿使成乱",
+  "000110":"泽地萃|荟萃相聚，以德相引",
+  "011000":"地风升|积小成高，柔以时升",
+  "010110":"泽水困|困穷守志，致命遂志",
+  "011010":"水风井|养而不穷，井养不穷",
+  "101110":"泽火革|顺天应人，革故鼎新",
+  "011101":"火风鼎|鼎新取象，稳重致远",
+  "100100":"震为雷|震动惊惧，恐惧修省",
+  "001001":"艮为山|行止有节，思不出位",
+  "001011":"风山渐|循序渐进，女归吉也",
+  "110100":"雷泽归妹|归妹乘时，动而有所",
+  "101100":"雷火丰|丰大光明，盛极戒满",
+  "001101":"火山旅|行旅在外，柔顺得安",
+  "011011":"巽为风|顺而能入，申命行事",
+  "110110":"兑为泽|和悦相亲，丽泽相说",
+  "010011":"风水涣|涣散得聚，风行水上",
+  "110010":"水泽节|节制有度，适可而止",
+  "110011":"风泽中孚|诚信在中，豚鱼可格",
+  "001100":"雷山小过|小者过而亨，宜下不宜上",
+  "101010":"水火既济|事已成矣，慎防反复",
+  "010101":"火水未济|事未竟也，慎终如始"
+};
 
-        function generateNumbers(hexagram) {
-            const binary = hexagram.map(yao => yao === '阳' ? 1 : 0);
-            
-            // 前区号码生成（确保5个不重复）
-            const frontSet = new Set();
-            while(frontSet.size < 5) {
-                frontSet.add(
-                    (binary.slice(0,3).reduce((a,b) => a+b, 0) * 5 + frontSet.size) % 35 + 1
-                );
-            }
-            
-            // 后区号码生成（确保2个不重复）
-            const backSet = new Set();
-            while(backSet.size < 2) {
-                backSet.add(
-                    (binary.reduce((a,b) => a+b, 0) * 3 + backSet.size) % 12 + 1
-                );
-            }
-            
-            return {
-                front: Array.from(frontSet).sort((a,b) => a - b),
-                back: Array.from(backSet).sort((a,b) => a - b)
-            };
-        }
+/* ============ 工具：哈希 + PRNG ============ */
+function xfnv1a(str){
+  let h = 2166136261 >>> 0;
+  for(let i=0;i<str.length;i++) h = Math.imul(h ^ str.charCodeAt(i), 16777619);
+  return h >>> 0;
+}
+function mulberry32(a){
+  return function(){
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    let t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
 
-        function generateNew() {
-            const hexagram = generateHexagram();
-            const parsed = parseHexagram(hexagram);
-            const numbers = generateNumbers(hexagram);
-            
-            const container = document.getElementById('resultContainer');
-            container.innerHTML = `
-                <div class="hexagram-box">
-                    <h3>卦象组成：</h3>
-                    <div class="yao-lines">
-                        ${hexagram.map((yao, idx) => 
-                            `<div class="yao-line">
-                                第${idx+1}爻：${yao}爻
-                                <span class="explanation">${yaoDict[idx+1][yao]}</span>
-                            </div>`
-                        ).join('')}
-                    </div>
-                    
-                    <h3>卦象解析：</h3>
-                    <p>${parsed.lowerTrigram[0]}下${parsed.upperTrigram[0]}上卦</p>
-                    <p>卦辞：${parsed.lowerTrigram[1]} · ${parsed.upperTrigram[1]}</p>
-                    
-                    <h3>吉凶判断：</h3>
-                    <p class="luck-level">${parsed.luck}</p>
-                </div>
-                
-                <div class="numbers-result">
-                    <h2>生成号码：</h2>
-                    <p class="numbers">前区：${numbers.front.join(' ')}</p>
-                    <p class="numbers">后区：${numbers.back.join(' ')}</p>
-                </div>
-                
-                <div class="notice">
-                    温馨提示：本结果仅供易经文化研究参考，请理性对待
-                </div>
-            `;
-        }
-    </script>
+/* ============ 起卦：六次投掷，每次三枚铜钱 ============ */
+// 单枚：true=背(阳)，false=字(阴)
+function throwCoin(){ return Math.random() < 0.5; }
+
+// 三枚 → 爻值：9老阳 7少阳 8少阴 6老阴
+function throwYao(){
+  const c = [throwCoin(), throwCoin(), throwCoin()];
+  const backs = c.filter(Boolean).length;       // 背面数
+  let val;
+  if(backs === 3) val = 9;       // 老阳
+  else if(backs === 2) val = 7;  // 少阳
+  else if(backs === 1) val = 8;  // 少阴
+  else val = 6;                  // 老阴
+  const coinText = c.map(x => x ? "背" : "字").join("");
+  return { val, isYang: val === 7 || val === 9, changing: val === 6 || val === 9, coinText };
+}
+
+function yaosToBinary(yaos){ // 初→上 串
+  return yaos.map(y => y.isYang ? "1" : "0").join("");
+}
+function benToZh(yaos){ // 变爻阴阳互转
+  return yaos.map(y => (y.isYang ? "0" : "1")).join("");
+}
+
+function yaoName(i, isYang){
+  const pos = i === 0 ? "初" : i === 5 ? "上" : ["二","三","四","五"][i-1];
+  return pos + (isYang ? "九" : "六");
+}
+
+/* ============ 号码生成 ============ */
+function drawBalls(rng, count, max){
+  const pool = Array.from({length:max}, (_,i)=>i+1);
+  for(let i=pool.length-1;i>0;i--){
+    const j = Math.floor(rng() * (i+1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  return pool.slice(0, count).sort((a,b)=>a-b);
+}
+function genNumbers(seedStr){
+  const rng = mulberry32(xfnv1a(seedStr));
+  return { front: drawBalls(rng,5,35), back: drawBalls(rng,2,12) };
+}
+
+/* ============ 渲染 ============ */
+const $ = id => document.getElementById(id);
+let current = null; // {yaos, ben, zh, front, back, seed}
+
+function renderHexagram(yaos){
+  const hex = $("hexagram");
+  hex.innerHTML = "";
+  yaos.forEach((y, i) => {
+    const div = document.createElement("div");
+    div.className = "yao" + (y.changing ? " changing" : "");
+    div.style.animationDelay = (i * 0.08) + "s";
+    const line = document.createElement("div");
+    line.className = "line";
+    if(y.isYang){ const a=document.createElement("div"); a.className="yang"; line.appendChild(a); }
+    else { const a=document.createElement("div"); a.className="yin"; const b=document.createElement("div"); b.className="yin"; line.append(a,b); }
+    const tag = document.createElement("div"); tag.className="tag"; tag.textContent = yaoName(i, y.isYang) + (y.changing ? (y.val===9?" ○":" ✕") : "");
+    const coins = document.createElement("div"); coins.className="coins"; coins.textContent = y.coinText;
+    div.append(tag, line, coins);
+    hex.appendChild(div);
+  });
+}
+function splitGua(s){ const [name, judge] = (GUA[s] || "未知卦|").split("|"); return {name, judge}; }
+function escapeHtml(s){ return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+const BLESSINGS = [
+  "福至心灵","心诚则灵","吉人天相","紫气东来","时来运转","否极泰来",
+  "鸿运当头","顺风顺水","天官赐福","云开月明","万事胜意","守正待时",
+  "厚德载福","一念清宁","机缘自显","平安是福","动静皆吉","德厚流光"
+];
+
+function renderNumbers(nums){
+  const fb = $("frontBalls"); fb.innerHTML="";
+  nums.front.forEach((n,i)=>{
+    const b=document.createElement("div"); b.className="ball"; b.textContent=n; b.style.animationDelay=(i*0.06)+"s"; fb.appendChild(b);
+  });
+  const bb = $("backBalls"); bb.innerHTML="";
+  nums.back.forEach((n,i)=>{
+    const b=document.createElement("div"); b.className="ball back"; b.textContent=n; b.style.animationDelay=(0.3+i*0.06)+"s"; bb.appendChild(b);
+  });
+}
+
+function cast(){
+  const intent = ($("intentInput").value || "").trim().slice(0,40);
+  const yaos = Array.from({length:6}, throwYao);
+  const benStr = yaosToBinary(yaos);
+  const zhStr  = benToZh(yaos);
+  const seed = benStr + "|" + zhStr + (intent ? "|u" + xfnv1a(intent) : "");
+  const nums = genNumbers(seed);
+  current = { yaos, benStr, zhStr, front:nums.front, back:nums.back, seed, intent };
+
+  renderHexagram(yaos);
+  const ben = splitGua(benStr), zh = splitGua(zhStr);
+  $("benName").textContent = ben.name; $("benJudge").textContent = ben.judge;
+  $("zhName").textContent  = zh.name;  $("zhJudge").textContent  = zh.judge;
+
+  const changes = yaos.map((y,i)=>y.changing?yaoName(i,y.isYang):null).filter(Boolean);
+  $("meta").innerHTML =
+    `本卦二进制 <code>${benStr}</code>（值 ${parseInt(benStr,2)}）<br>` +
+    `之卦二进制 <code>${zhStr}</code>（值 ${parseInt(zhStr,2)}）<br>` +
+    `意念参数：<code>${intent ? escapeHtml(intent) : "（无）"}</code>${intent ? "（已纳入推演）" : ""}<br>` +
+    (changes.length ? `变爻：${changes.join("、")}　→　静卦化而动` : `无变爻：静卦，数自成`);
+
+  renderNumbers(nums);
+  $("blessing").textContent = BLESSINGS[xfnv1a(seed) % BLESSINGS.length];
+  $("numMeta").innerHTML = `卦象既成，号码随显。前区和 ${nums.front.reduce((a,b)=>a+b,0)}，后区和 ${nums.back.reduce((a,b)=>a+b,0)}。`;
+
+  saveHistory();
+}
+
+/* ============ 历史（localStorage） ============ */
+const KEY = "iching_dlt_history_v1";
+function loadHistory(){
+  try{ return JSON.parse(localStorage.getItem(KEY) || "[]"); }catch(e){ return []; }
+}
+function saveHistory(){
+  if(!current) return;
+  const list = loadHistory();
+  list.unshift({
+    t: new Date().toLocaleString("zh-CN",{month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit"}),
+    ben: splitGua(current.benStr).name,
+    zh: splitGua(current.zhStr).name,
+    front: current.front, back: current.back, intent: current.intent
+  });
+  const trimmed = list.slice(0, 20);
+  try{ localStorage.setItem(KEY, JSON.stringify(trimmed)); }catch(e){}
+  renderHistory();
+}
+function renderHistory(){
+  const list = loadHistory();
+  const box = $("history");
+  if(!list.length){ box.innerHTML = '<div class="hist-empty">尚无卜卦记录，起一卦试试？</div>'; return; }
+  box.innerHTML = "";
+  list.forEach(h=>{
+    const item = document.createElement("div"); item.className="hist-item";
+    const nums = [...h.front.map(n=>`<span class="mini">${n}</span>`), ...h.back.map(n=>`<span class="mini back">${n}</span>`)];
+    const intentTag = h.intent ? `　<span style="color:var(--accent-2)">「${escapeHtml(h.intent)}」</span>` : "";
+    item.innerHTML = `<div class="top"><span class="gua">${h.ben} → ${h.zh}${intentTag}</span><span>${h.t}</span></div><div class="nums">${nums.join("")}</div>`;
+    box.appendChild(item);
+  });
+}
+function clearHistory(){
+  try{ localStorage.removeItem(KEY); }catch(e){}
+  renderHistory(); toast("已清空记录");
+}
+
+/* ============ 交互 ============ */
+function toast(msg){
+  const t=$("toast"); t.textContent=msg; t.classList.add("show");
+  clearTimeout(t._timer); t._timer=setTimeout(()=>t.classList.remove("show"),1800);
+}
+function copyNumbers(){
+  if(!current){ toast("请先起卦"); return; }
+  const text = `大乐透（前区）${current.front.join(" ")} ｜（后区）${current.back.join(" ")}`;
+  navigator.clipboard?.writeText(text).then(()=>toast("号码已复制 ✅")).catch(()=>toast(text));
+}
+
+$("castBtn").addEventListener("click", cast);
+$("copyBtn").addEventListener("click", copyNumbers);
+$("clearBtn").addEventListener("click", clearHistory);
+$("intentInput").addEventListener("keydown", e => { if(e.key === "Enter") cast(); });
+renderHistory();
+</script>
 </body>
 </html>
