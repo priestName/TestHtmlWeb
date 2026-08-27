@@ -1,0 +1,1345 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="文言文答案之书——心中默想，翻书得签。以古籍册页美学呈现的单页交互工具。">
+<title>答案之书 · 问心自答</title>
+<!-- v3.4.1：内联 SVG favicon（纸色底 + 朱砂双线印章 + 竖排「問」，消除四视口 favicon.ico 404） -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22 viewBox%3D%220 0 32 32%22%3E%3Crect width%3D%2232%22 height%3D%2232%22 fill%3D%22%23F6F0E2%22%2F%3E%3Crect x%3D%222.5%22 y%3D%222.5%22 width%3D%2227%22 height%3D%2227%22 fill%3D%22none%22 stroke%3D%22%23AD3227%22 stroke-width%3D%222.2%22%2F%3E%3Crect x%3D%225.5%22 y%3D%225.5%22 width%3D%2221%22 height%3D%2221%22 fill%3D%22none%22 stroke%3D%22%23AD3227%22 stroke-width%3D%220.9%22 opacity%3D%220.55%22%2F%3E%3Ctext x%3D%2216%22 y%3D%2223.5%22 font-size%3D%2219%22 fill%3D%22%23AD3227%22 text-anchor%3D%22middle%22 font-family%3D%22Kaiti SC%2CSTKaiti%2CKaiTi%2Cserif%22 font-weight%3D%22bold%22%3E%E5%95%8F%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css">
+<!-- 签文库数据（独立文件：四书五经精选 + 四大名著警句，约 500 条；定义 window.ANSBOOK_SLIPS） -->
+<script src="../ansbook/ansbook-slips.js"></script>
+<style>
+/* ============ 1. 设计令牌 Design Tokens（严格取自 DESIGN-answerbook.md §10） ============ */
+:root{
+  /* 纸色 Paper */
+  --paper-bright:#FBF7EE;
+  --paper-bg:#F6F0E2;
+  --paper-card:#F0E8D6;
+  --paper-deep:#E7DCC3;
+  --paper-silk:#DCCEAD;
+  /* 墨色 Ink */
+  --ink-900:#14110C;
+  --ink-800:#241F18;
+  --ink-700:#3A332A;
+  --ink-600:#5A5246;
+  --ink-500:#7A7162;
+  --ink-300:#B5AA98;
+  /* 三档吉凶（古典语义：朱红吉庆 / 黛青中和 / 玄褐收敛，非西式红绿） */
+  --fortune-top:#AD3227;
+  --fortune-mid:#3D4C5D;
+  --fortune-low:#4C3C2B;
+  /* 朱砂 Vermilion */
+  --cinnabar-700:#8E2723;
+  --cinnabar-600:#AD3227;
+  --cinnabar-500:#C23A2E;
+  --seal-red:#A93B2B;
+  /* 黛青 Daiqing */
+  --daiqing-700:#2F3B49;
+  --daiqing-600:#3D4C5D;
+  --daiqing-500:#536272;
+  --daiqing-400:#6E7C8A;
+  /* 玄褐 Xuan */
+  --xuan-700:#2A221A;
+  --xuan-600:#3B2F22;
+  --xuan-500:#4C3C2B;
+  --xuan-400:#6A5A46;
+  /* 线色 Line */
+  --line-strong:#3A332A;
+  --line-normal:#7A7162;
+  --line-faint:#B5AA98;
+  /* 字体 Font stacks */
+  --font-song:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong","SimSun","NSimSun",serif;
+  --font-kai:"LXGW WenKai Screen","LXGW WenKai","Kaiti SC","STKaiti","KaiTi","楷体","Noto Serif SC",serif;
+  --font-fang:"FangSong","STFangsong","仿宋","Noto Serif SC",serif;
+  /* 字号阶 Type scale */
+  --fs-cover:52px;
+  --fs-title:34px;
+  --fs-answer:26px;
+  --fs-lead:20px;
+  --fs-label:17px;
+  --fs-note:15px;
+  --fs-micro:13px;
+  /* 版心 Margin */
+  --margin-tian:72px;
+  --margin-di:52px;
+  --margin-shukou:64px;
+  --margin-shunao:40px;
+  /* 间距 Spacing */
+  --space-2xs:4px;
+  --space-xs:8px;
+  --space-sm:12px;
+  --space-md:16px;
+  --space-lg:24px;
+  --space-xl:32px;
+  --space-2xl:48px;
+  --space-3xl:64px;
+  --space-4xl:80px;
+  /* 动效 Motion */
+  --flip-duration:900ms;
+  --flip-ease:cubic-bezier(.4,.1,.25,1);
+  --flip-ease-soft:cubic-bezier(.36,1.26,.42,1);   /* v3.4：带回弹感（用于 -90° 次翻转与高光，避免 -180° 反相闪烁） */
+  /* v3.5：模拟手机宽度容器（430px 上限，手机视口自然全宽） */
+  --phone-w:min(430px, 100vw);
+  /* 纸纹（feTurbulence，透明度 ≤ 0.05） */
+  --paper-noise:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+}
+
+/* ============ 2. 基础 Base ============ */
+*{ margin:0; padding:0; box-sizing:border-box; }
+html,body{ height:100%; overflow:hidden; }   /* v3.3：全局锁定一屏，杜绝滚动 */
+body{
+  /* v3.5：纸色渐变（生宣 → 熟宣，方向渐变），替代纯色纸底 */
+  background:linear-gradient(165deg, var(--paper-bg) 0%, var(--paper-card) 100%);
+  color:var(--ink-800);
+  font-family:var(--font-song);
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  overflow:hidden;   /* v3.3：由 overflow-x:hidden 升级为双轴锁定（移动端关键） */
+}
+/* 整页纸纹（极淡，不抢戏） */
+body::before{
+  content:''; position:fixed; inset:0; z-index:0;
+  background-image:var(--paper-noise);
+  pointer-events:none;
+}
+::selection{ background:rgba(173,50,39,.16); }
+
+/* ============ 2.5 背景装饰层 Background Decoration（v3.5） ============
+   纸色渐变 + 隐约云纹 + 远山线条 + 印章水印 + 竖排大字「乾坤一冊」。
+   整层 pointer-events:none，绝不遮挡 430px 内容区交互；aria-hidden 供屏幕阅读器忽略。 */
+.bg-deco{
+  position:fixed; inset:0; z-index:0; overflow:hidden;
+  pointer-events:none; user-select:none;
+}
+.deco-cloud{   /* 云纹水印（复用 p-cloud，≤.06） */
+  position:absolute; inset:0; width:100%; height:100%;
+  color:var(--ink-600); opacity:.05;
+}
+.deco-mountain{   /* 远山线条水印（简洁轮廓，≤.05；v3.5.1 上限 280px，超大桌面不过度占空间） */
+  position:absolute; left:0; right:0; bottom:0; width:100%; height:min(30vh, 280px);
+  color:var(--ink-600); opacity:.05;
+}
+.deco-seal{   /* 印章水印（右下角「知天命」，≤.05，仿印泥双线方印） */
+  position:absolute; right:5%; bottom:9%;
+  width:108px; height:108px;
+  display:flex; align-items:center; justify-content:center;
+  border:2px solid var(--seal-red); color:var(--seal-red); opacity:.05;
+}
+.deco-seal::before{ content:''; position:absolute; inset:5px; border:1px solid var(--seal-red); }
+.deco-seal i{
+  font-style:normal; writing-mode:vertical-rl; text-orientation:mixed;
+  font-family:var(--font-kai); font-weight:600; font-size:19px; letter-spacing:.14em;
+}
+.deco-title{   /* 竖排大字「乾坤一冊」（ink-300 级低对比，桌面/平板显示；手机端隐藏） */
+  position:absolute; left:3.5%; top:50%; transform:translateY(-50%);
+  writing-mode:vertical-rl; text-orientation:mixed;
+  font-family:var(--font-song); font-weight:600; font-size:52px;
+  letter-spacing:.3em; color:var(--ink-300); opacity:.5;
+}
+@media (max-width:640px){ .deco-title{ display:none; } }
+
+.stage{
+  position:relative; z-index:1;
+  /* v3.5：内容容器限宽 430px 居中（桌面/平板模拟手机宽度；手机自然全宽） */
+  max-width:430px; margin:0 auto;
+  height:100vh; height:100svh; height:100dvh;   /* v3.4：三级回退 100vh→100svh→100dvh（旧浏览器 dvh 缺失时不错位） */
+  overflow:hidden;               /* v3.3：内部亦锁定，四视口零滚动 */
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  /* v3.5：左右安全边距 ≥12px（safe-area 保留）；
+     v3.7.3：padding 36/88→24/48（用户截图反馈"上下留白太多"，减少 88→48 大幅缩减地脚留白） */
+  padding:24px max(16px, env(safe-area-inset-left)) 48px max(16px, env(safe-area-inset-right));
+}
+/* 页面四角题签（淡墨小字，视口右上角） */
+.stage-colophon{
+  position:fixed; top:26px; right:30px; z-index:2;
+  writing-mode:vertical-rl;
+  font-family:var(--font-fang); font-size:var(--fs-micro);
+  letter-spacing:.45em; color:var(--ink-300);
+  user-select:none; pointer-events:none;
+}
+
+/* ============ 3. 书 Book（v3.5：全端单页 3:4，430px 容器内推导） ============ */
+.book-wrap{
+  position:relative;
+  /* v3.3：内扩容纳「书堆假页」的右/下外伸（peek），并用负 margin 抵消，
+     使 book-wrap 自身 scrollWidth/Height <= clientWidth/Height（零滚动验收） */
+  padding:10px 14px 14px 10px;
+  margin:-10px -14px -14px -10px;
+}
+.book{
+  position:relative;
+  /* v3.5：单页 3:4 —— 宽 = 430px 容器内宽（min(430px,100vw)-56px，56=stage 左右 32 + book-wrap 24）
+     与 dvh 竖向推导（高=宽×4/3 ≤ 视口高-固定区）取小，保证整书不超一屏 */
+  width:min(calc(var(--phone-w) - 56px), calc((100dvh - 300px) * .75));
+  aspect-ratio:3/4;
+  perspective:1600px;
+  cursor:pointer;
+  touch-action:manipulation;   /* v3.4：消除移动端 300ms 点击延迟 / 双击缩放抢点击 */
+  box-shadow:0 2px 12px rgba(20,17,12,.14);   /* 书堆级投影（唯一允许） */
+  transition:box-shadow .5s ease;
+  outline:none;
+}
+.book.flipping{ box-shadow:0 5px 20px rgba(20,17,12,.24); }   /* v3.4：翻页中书堆投影呼吸（真实翻书厚度感） */
+.book:focus-visible{ outline:2px solid var(--cinnabar-600); outline-offset:8px; }
+
+/* 书堆（封面下叠 3–5 层假页边）；v3.3：right/bottom 内缩，使假页外伸 + 层位移
+   恰好落在 book-wrap 内扩的 padding 区内，不产生滚动溢出 */
+.book-stack{ position:absolute; left:6px; top:8px; right:8px; bottom:6px; z-index:0; pointer-events:none; }
+.stack-layer{ position:absolute; inset:0; background:var(--paper-deep); border:1px solid var(--paper-silk); }
+.stack-layer.l1{ transform:translate(2px,2px); }
+.stack-layer.l2{ transform:translate(4px,3px); }
+.stack-layer.l3{ transform:translate(6px,5px); }
+.stack-layer.l4{ transform:translate(8px,6px); }
+
+/* 页面 Page（v3.5：仅单页签文卡，左页引导已移除） */
+.page{
+  position:relative; aspect-ratio:3/4;
+  background:var(--paper-card);
+  background-image:var(--paper-noise);
+  overflow:hidden;
+}
+.page-right{
+  z-index:1; background:var(--paper-card);
+  transform-style:preserve-3d; transform-origin:left center;
+  transition:transform 420ms var(--flip-ease-soft);   /* v3.4：-90° 次翻转带回弹感（不过 180°，无背反闪烁） */
+  backface-visibility:hidden; -webkit-backface-visibility:hidden;
+  will-change:transform;
+}
+.page-right.turning{ transform:rotateY(-90deg); }
+/* 书口厚度（页缘淡墨，右缘） */
+.page-right::after{ content:''; position:absolute; top:0; bottom:0; right:0; width:14px; z-index:3; pointer-events:none;
+  background:linear-gradient(90deg, transparent, rgba(20,17,12,.08)); }
+
+/* ============ 4. 翻页封面 Flip Cover ============ */
+.flip-face{
+  position:absolute; top:0; left:0; width:100%; height:100%;   /* v3.5：始终覆盖整页（单页化，移除桌面左50%右半页） */
+  transform-style:preserve-3d;
+  transform-origin:left center;               /* 书脊侧 */
+  transition:
+    transform var(--flip-duration) var(--flip-ease),
+    visibility 0s linear var(--flip-duration); /* 扉页停留：.gone 的 visibility 在翻完动画后才生效（P1-1） */
+  z-index:10; cursor:pointer;
+  touch-action:manipulation;   /* v3.4：触屏点击即时响应 */
+  will-change:transform;
+}
+.flip-face .face{
+  position:absolute; inset:0;
+  backface-visibility:hidden; -webkit-backface-visibility:hidden;
+  overflow:hidden;
+  background-image:var(--paper-noise);
+}
+.flip-face .face-back{ transform:rotateY(180deg); }   /* 背面镜像 */
+.flip-face.flipped{ transform:rotateY(-180deg); }
+.flip-face.gone{ visibility:hidden; pointer-events:none; }   /* v3.4：翻完彻底脱离命中，杜绝 iOS WebKit 残留热区 */
+
+/* v3.4：翻页前缘高光（模拟纸张卷起受光）——亮起→保持→随翻毕淡出，与 --flip-duration 同步
+   用 animation 而非 transition：.flipped/.gone 同时添加时避免同级选择器互相覆盖（级联冲突） */
+.flip-sheen{
+  position:absolute; top:0; bottom:0; right:0; width:48px; z-index:6; pointer-events:none;
+  background:linear-gradient(90deg, rgba(20,17,12,0) 0%, rgba(20,17,12,.12) 55%, rgba(251,247,238,.42) 100%);
+  opacity:0; transform:scaleX(0); transform-origin:right center;
+}
+.flip-face.flipped .flip-sheen{
+  animation:sheenGlint var(--flip-duration) var(--flip-ease) forwards;
+}
+@keyframes sheenGlint{
+  0%{ opacity:0; transform:scaleX(.15); }
+  22%{ opacity:1; transform:scaleX(1); }
+  72%{ opacity:1; transform:scaleX(1); }
+  100%{ opacity:0; transform:scaleX(1); }
+}
+
+/* 封面（正面） */
+.face-front{ background:var(--paper-deep); display:flex; align-items:center; justify-content:center; }
+/* v3.6 关键改动（主页：封面元素与文武线/书页边缘间距加大）
+   - A. .cover-frame inset:18 → 30（内框四周各加 12px，让元素远离文武线双线）
+   - B. .cover-content gap:16 → 28（元素间垂直留白加大，副题与印章不再紧贴）
+   - C. .cover-content padding:20px 32px（天头/地脚 20px，左右 32px；
+     内 padding 强制让元素远离左右文武线）
+   - D. .cover-hint margin-top:8px（再加 8px 与「知天命」印章分隔）
+   - E. .cover-content 改用 grid 布局（grid-template-columns:1fr; justify-items:center）
+     + max-width:340px + margin:0 auto，强制让所有子元素在水平方向居中
+   - F. .cover-title 用 display:inline-block + 固定 width:72px + text-align:center
+     + margin:0 auto（让竖排字符在固定宽盒子内水平居中 → 视觉上字符列正好居中
+     于 cover-content 中央；解决 vertical-rl 元素 auto width 计算异常的问题） */
+.cover-frame{
+  position:absolute; inset:30px;   /* v3.6：A 项 */
+  box-shadow:
+    inset 0 0 0 1px var(--line-strong),
+    inset 0 0 0 3px var(--paper-deep),
+    inset 0 0 0 4px var(--line-faint);
+}
+.cover-pattern{ position:absolute; inset:0; width:100%; height:100%; color:var(--ink-600); opacity:.05; }
+.cover-content{
+  /* v3.7.1：position:relative → absolute; inset:0 —— 原为 relative 块级，高度=内容自然高度，
+     导致 align-content:center 无效，元素从顶部向下堆叠，「答」字贴顶部文武线、「默想...」
+     贴底部；现改为 absolute 充满 .face，让 grid 居中真正生效，上下对称 */
+  position:absolute; inset:0; z-index:2;
+  display:grid;                              /* v3.6：E 项 */
+  grid-template-columns:1fr;                 /* v3.6：单列网格 */
+  justify-items:center;                      /* v3.6：所有网格项水平居中 */
+  align-content:center;                      /* v3.6：网格整体垂直居中 */
+  gap:24px;                                  /* v3.7.1：28→24 略收（绝对定位后 grid 居中，间距自动均分） */
+  padding:24px 32px;                         /* v3.6：C 项（左右 32px 内补） */
+  max-width:340px;                           /* v3.6：E 项 */
+  margin:auto;                               /* v3.7.1：absolute 下用 margin:auto 让 max-width 容器居中 */
+  width:100%;
+  box-sizing:border-box;
+}
+.cover-title{
+  writing-mode:vertical-rl; text-orientation:mixed;
+  font-family:var(--font-song); font-weight:700; font-size:var(--fs-cover);
+  letter-spacing:.22em; color:var(--ink-900);
+  /* v3.7.4.1：width 72px → max-content —— 原固定 72px 盒子装不下竖排 4 字
+     （430px 视口 36px×4≈144px、桌面 52px×4≈208px），文字超出盒子向右溢出导致"偏右"；
+     max-content 让盒子宽度=内容宽度，居中后视觉正好居中 */
+  display:inline-block;
+  width:max-content;
+  text-align:center;
+  margin:0 auto;
+  justify-self:center;
+}
+.cover-sub{
+  writing-mode:horizontal-tb;
+  font-family:var(--font-fang); font-size:12px;
+  letter-spacing:.25em; color:var(--ink-500);
+  justify-self:center;
+}
+.cover-hint{
+  display:block;
+  font-family:var(--font-kai); font-size:var(--fs-micro);
+  letter-spacing:.22em; color:var(--ink-500); text-align:center;
+  margin-top:8px;                            /* v3.6：D 项 */
+  justify-self:center;
+}
+/* 印章 Seal（v3.2 印泥不均：多重 inset 阴影 + 双向 radial-gradient + noise 叠层） */
+.seal{
+  position:relative;
+  background:var(--seal-red); color:var(--paper-bright);
+  border-radius:2px;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  font-family:var(--font-kai); font-weight:600; letter-spacing:.18em;
+  /* 多重 inset 阴影模拟印泥凹凸 */
+  box-shadow:
+    inset 0 0 0 1px rgba(251,247,238,.42),
+    inset 0 0 6px rgba(80,10,5,.32),
+    inset 0 0 0 2px rgba(0,0,0,.08),
+    inset 3px 3px 8px rgba(0,0,0,.14);
+  background-image:
+    radial-gradient(circle at 28% 28%, rgba(255,255,255,.14), transparent 55%),
+    radial-gradient(circle at 74% 76%, rgba(0,0,0,.14), transparent 60%);
+  overflow:hidden;
+}
+.seal::after{   /* 噪点叠层（multiply，模拟印泥不平） */
+  content:''; position:absolute; inset:0;
+  background-image:var(--paper-noise);
+  opacity:.20; mix-blend-mode:multiply;
+  pointer-events:none;
+}
+.seal i{ font-style:normal; position:relative; z-index:1; }
+.seal-lg{ width:72px; height:72px; font-size:var(--fs-note); gap:2px; }
+.seal-sm{ width:40px; height:40px; font-size:14px; }
+/* 黛青·玄褐印章变体（解印/落款用黛青，避免与朱砂吉凶印撞色） */
+.seal-daiqing{
+  background:var(--daiqing-700);
+  box-shadow:
+    inset 0 0 0 1px rgba(251,247,238,.42),
+    inset 0 0 6px rgba(20,30,40,.34),
+    inset 0 0 0 2px rgba(0,0,0,.10),
+    inset 3px 3px 8px rgba(0,0,0,.16);
+  background-image:
+    radial-gradient(circle at 28% 28%, rgba(255,255,255,.13), transparent 55%),
+    radial-gradient(circle at 74% 76%, rgba(0,0,0,.16), transparent 60%);
+}
+
+/* 封面（背面·扉页，翻动时闪现） */
+.face-back{ background:var(--paper-card); display:flex; align-items:center; justify-content:center; }
+.inner-head{
+  position:absolute; top:32px; right:32px;
+  writing-mode:vertical-rl;
+  font-family:var(--font-fang); font-size:var(--fs-micro);
+  letter-spacing:.5em; color:var(--ink-300);
+}
+.inner-content{ display:flex; flex-direction:column; align-items:center; gap:28px; }
+.inner-title{
+  writing-mode:vertical-rl;
+  font-family:var(--font-song); font-weight:600; font-size:var(--fs-title);
+  letter-spacing:.18em; color:var(--ink-700);
+}
+.inner-note{
+  writing-mode:vertical-rl;
+  font-family:var(--font-kai); font-size:var(--fs-note);
+  letter-spacing:.3em; color:var(--ink-500);
+}
+
+/* ============ 5. 提问输入 Question Note（v3 古籍便笺） ============ */
+.question-wrap{
+  position:relative; z-index:2;
+  margin-bottom:22px;
+  /* v3.5：宽度与书对齐（430 容器内宽 - book-wrap 24px） */
+  width:calc(var(--phone-w) - 56px);
+  max-height:70px;                        /* v3.3：供翻书后高度塌陷（0），签文卡完整露出 */
+  overflow:hidden;                        /* v3.3：塌陷时裁切内部输入框（scrollHeight 归零） */
+  transition:opacity .35s ease, visibility .35s, max-height .35s ease, margin-bottom .35s ease;
+}
+/* v3.3：翻书后输入框淡出并塌陷；「再问一签」保持隐藏仅按钮，签文卡与输入框永不共存 */
+.stage.opened .question-wrap{
+  opacity:0; visibility:hidden; max-height:0; margin-bottom:0; pointer-events:none;
+}
+.stage.opened .question-field{ display:none; }   /* v3.3：彻底移除输入框，scrollHeight 归零（wrap 仍以 max-height 过渡塌陷） */
+.stage.opened .question-mark{ display:none; }   /* v3.3：塌陷时移除「問」标记 */
+.question-field{
+  width:100%;
+  appearance:none; border:none; outline:none;
+  background:var(--paper-bright);
+  background-image:var(--paper-noise);
+  color:var(--ink-800);
+  font-family:var(--font-kai); font-size:var(--fs-note);
+  letter-spacing:.08em;
+  padding:14px 46px 14px 18px;
+  border-radius:0;
+  touch-action:manipulation;   /* v3.4：触屏即时响应 */
+  /* 文武线（与签文卡同款：浓墨 + 枯墨双线） */
+  box-shadow:
+    inset 0 0 0 1px var(--line-strong),
+    inset 0 0 0 3px var(--paper-bright),
+    inset 0 0 0 4px var(--line-faint);
+}
+.question-field::placeholder{ color:var(--ink-500); letter-spacing:.1em; }
+.question-field:focus{
+  box-shadow:
+    inset 0 0 0 1px var(--cinnabar-600),
+    inset 0 0 0 3px var(--paper-bright),
+    inset 0 0 0 4px var(--line-faint);
+  /* v3.1 P2-3：焦点环外补 outline，增强屏幕阅读器可见性 */
+  outline:1px solid var(--cinnabar-600); outline-offset:2px;
+}
+.question-mark{
+  position:absolute; top:50%; right:16px; transform:translateY(-50%);
+  font-family:var(--font-kai); font-size:var(--fs-micro);
+  color:var(--seal-red); letter-spacing:0;
+  pointer-events:none; user-select:none;
+}
+
+/* ============ 6. 签文卡 Fortune Slip ============ */
+.slip{
+  position:absolute; inset:0;
+  background:var(--paper-bright);
+  background-image:var(--paper-noise);
+  /* 文武线框（浓墨 + 枯墨双线） */
+  box-shadow:
+    inset 0 0 0 1px var(--line-strong),
+    inset 0 0 0 3px var(--paper-bright),
+    inset 0 0 0 4px var(--line-faint);
+}
+/* 卡面水印纹样 */
+.slip-pattern{ position:absolute; inset:0; width:100%; height:100%; opacity:.07; z-index:0; }
+.slip-top .slip-pattern{ color:var(--fortune-top); }
+.slip-mid .slip-pattern{ color:var(--fortune-mid); }
+.slip-low .slip-pattern{ color:var(--fortune-low); }
+/* 档位专属纹样（天头/地脚装饰；v3.5 全端按移动端紧凑值定位） */
+/* v3.3：祥云改置左上（远离右上角签号/吉凶标），杜绝纹样压在签号文字上 */
+.orn-cloud{ position:absolute; top:30px; left:26px; right:auto; width:84px; height:56px; color:var(--cinnabar-500); opacity:.10; display:none; z-index:2; }   /* v3.1 P2-1：单点装饰，opacity .10 对齐规范 §7 */
+.slip-top .orn-cloud{ display:block; }
+.orn-hui{ position:absolute; left:32px; right:32px; height:16px; color:var(--daiqing-400); opacity:.25; display:none; z-index:2; }
+.orn-hui.orn-hui-top{ top:8px; }   /* v3.3：上移出签号区（slip-head top:28px 以下） */
+.orn-hui.orn-hui-bot{ bottom:12px; }   /* v3.3：12px，与地脚落款（bottom:20px）留出间隙 */
+.slip-mid .orn-hui{ display:block; }
+.orn-wave{ position:absolute; left:34px; right:34px; bottom:8px; height:12px; color:var(--xuan-400); opacity:.32; display:none; z-index:2; }   /* v3.3：8px 贴地脚线，避免压落款/小印 */
+.slip-low .orn-wave{ display:block; }
+
+/* 天头：签号 + 吉凶标 */
+.slip-head{
+  position:absolute; top:28px; right:22px; z-index:3;   /* v3.5：全端按移动端紧凑值 */
+  display:flex; flex-direction:column; align-items:flex-end; gap:16px;
+}
+.slip-no{
+  /* v3.7：字号微缩 15→14px，字距收紧 .2em→.1em（防长签号「第壹佰叁拾陆签」横排挤压吉凶印章），
+     颜色提一档 ink-500→ink-700（强化与吉凶印章的视觉呼应），左侧加 1px 枯墨细线作"卷宗"装饰 */
+  font-family:var(--font-fang); font-size:14px; letter-spacing:.1em; color:var(--ink-700);
+  padding-left:8px; border-left:1px solid var(--line-faint);
+}
+.slip-top .slip-no{ color:var(--cinnabar-600); }
+.slip-mid .slip-no{ color:var(--daiqing-600); }
+.slip-low .slip-no{ color:var(--xuan-500); }
+/* 吉凶标签（竖式印章标 44×96） */
+.fortune-label{
+  position:relative; width:44px; height:96px; border-radius:2px;
+  display:flex; align-items:center; justify-content:center;
+  color:var(--paper-bright); overflow:hidden;
+}
+.fortune-top{ background:var(--cinnabar-600); }
+.fortune-mid{ background:var(--daiqing-600); }
+.fortune-low{ background:var(--xuan-500); }
+.label-pattern{ position:absolute; inset:0; width:100%; height:100%; color:#fff; opacity:.08; }
+.label-chars{
+  position:relative; z-index:2;
+  display:flex; flex-direction:column; align-items:center; gap:8px;
+  font-family:var(--font-kai); font-size:var(--fs-label); letter-spacing:.05em;
+}
+.label-chars i{ font-style:normal; }
+
+/* 中部：竖排签文（v3.7.1：字号/行高三档缩档，桌面端 ≤8 字短签文单列容纳、
+   >10 字长签文按列换行仍可读完；默认 .92、短签文 8 字 23.9×1.6×8 ≈ 306px < max-height 65%×498=324px ✓，
+   长签文 .75 行高 1.5：11 字 19.5×1.5×11 ≈ 322px < max-height 70%×498=349px ✓） */
+.slip-body{
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); z-index:3;
+  writing-mode:vertical-rl; text-orientation:mixed;
+  font-family:var(--font-kai); font-weight:500;
+  font-size:calc(var(--fs-answer) * .92);
+  letter-spacing:.12em; line-height:1.6;
+  color:var(--ink-800);
+  white-space:normal;
+  height:auto;
+  max-height:65%;
+  max-width:54%;
+  overflow:hidden;
+}
+/* 长签文（>10 字）降一档字号 + 更紧行高（v3.7.1：×0.92→×0.75，行高 1.6→1.5，max-height 65→70） */
+.slip-body.long{ font-size:calc(var(--fs-answer) * .75); letter-spacing:.1em; line-height:1.5; max-height:70%; }
+
+/* 地脚：出处 + 小印（v3.7：移除問心堂落款后，两件元素间距收紧 16→12，落款与小印左右呼应） */
+.slip-foot{
+  position:absolute; bottom:22px; left:24px; z-index:3;
+  display:flex; align-items:flex-end; gap:12px;
+}
+.slip-note{
+  /* v3.7：竖排出处加 1px 枯墨左细线作"卷宗"装饰，与天头签号呼应 */
+  writing-mode:vertical-rl; text-orientation:mixed;
+  font-family:var(--font-fang); font-size:var(--fs-note);
+  letter-spacing:.06em; line-height:1.6; color:var(--ink-500);
+  max-height:150px;
+  white-space:normal;   /* v3.3：长出处（如「三国志·吴书·吕蒙传 引语」）按列换行，不溢出 */
+  padding-left:8px; border-left:1px solid var(--line-faint);
+}
+.slip-colophon{
+  writing-mode:vertical-rl;
+  font-family:var(--font-fang); font-size:var(--fs-micro);
+  letter-spacing:.3em; color:var(--ink-500);
+}
+
+/* ============ 7. 控件 Controls ============ */
+/* v3.7.3：.controls 默认 max-height:0 + overflow:hidden 折叠，不占据布局空间；
+   之前用 display:flex + visibility:hidden 隐藏按钮，控件区仍占空间——用户截图反馈"隐藏时也占用空间" */
+.controls{
+  margin-top:24px;
+  padding-bottom:6px;   /* v3.3：容纳隐藏按钮 translateY(6px) 的入场位移，controls 自身零滚动溢出 */
+  display:flex; justify-content:center; align-items:center; gap:16px; flex-wrap:wrap;
+  max-height:0; overflow:hidden; opacity:0; visibility:hidden;
+  transition:max-height .35s ease, margin-top .35s ease, padding-bottom .35s ease, opacity .35s ease, visibility .35s;
+}
+/* v3.7.3：翻书后 .stage.opened 时 controls 展开 —— max-height 80px 容纳两个按钮 + margin-top/padding-bottom */
+.stage.opened .controls{
+  max-height:80px; opacity:1; visibility:visible;
+}
+.btn-ask{
+  appearance:none; border:2px solid var(--ink-700); background:transparent;
+  color:var(--ink-800);
+  font-family:var(--font-song); font-size:var(--fs-label);
+  letter-spacing:.3em; text-indent:.3em;
+  padding:12px 30px; border-radius:0;
+  cursor:pointer; writing-mode:horizontal-tb;
+  touch-action:manipulation;   /* v3.4：触屏即时响应 */
+  /* 文武线 inset */
+  box-shadow: inset 0 0 0 3px var(--paper-bg), inset 0 0 0 4px var(--ink-300);
+  opacity:0; visibility:hidden; transform:translateY(6px);
+  transition:background-color .3s ease, border-color .3s ease, color .3s ease,
+             opacity .45s ease, transform .45s ease, visibility .45s;
+}
+.btn-ask.visible{ opacity:1; visibility:visible; transform:none; }
+.btn-ask:hover{ border-color:var(--ink-900); background-image:radial-gradient(120% 120% at 50% 130%, rgba(58,51,42,.10), transparent 55%); }
+.btn-ask:active{ background:var(--ink-800); color:var(--paper-bright); }
+.btn-ask:focus-visible{ outline:2px solid var(--cinnabar-600); outline-offset:4px; }
+/* 「解曰」解析按钮（v3：比「再问一签」更低调，细线淡墨） */
+.btn-jie{
+  appearance:none; border:1px solid var(--line-normal); background:transparent;
+  color:var(--ink-600);
+  font-family:var(--font-fang); font-size:var(--fs-note);
+  letter-spacing:.3em; text-indent:.3em;
+  padding:13px 24px; border-radius:0;
+  cursor:pointer; writing-mode:horizontal-tb;
+  touch-action:manipulation;   /* v3.4：触屏即时响应 */
+  /* 细文武线 inset */
+  box-shadow: inset 0 0 0 2px var(--paper-bg), inset 0 0 0 3px var(--line-faint);
+  opacity:0; visibility:hidden; transform:translateY(6px);
+  transition:background-color .3s ease, border-color .3s ease, color .3s ease,
+             opacity .45s ease, transform .45s ease, visibility .45s;
+}
+.btn-jie.visible{ opacity:1; visibility:visible; transform:none; }
+.btn-jie:hover{ border-color:var(--ink-900); color:var(--ink-800); }
+.btn-jie:active{ background:var(--ink-500); color:var(--paper-bright); }
+.btn-jie:focus-visible{ outline:2px solid var(--cinnabar-600); outline-offset:4px; }
+
+/* ============ 8. 页脚 Footer（克制不抢戏；v3.5 对齐 430px 容器居中） ============ */
+.footer{
+  position:absolute; bottom:28px; left:0; right:0; z-index:2;
+  max-width:430px; margin:0 auto;   /* v3.5：与 430px 内容容器对齐居中 */
+  display:flex; align-items:center; justify-content:center; gap:14px;
+  font-family:var(--font-kai); font-size:var(--fs-micro); color:var(--ink-600);   /* v3.5.1：ink-500→ink-600（4.23→5.5:1，AA 达标） */
+}
+.footer-link{ color:var(--ink-500); text-decoration:none; letter-spacing:.08em; border-bottom:1px solid transparent; transition:color .3s ease; }
+.footer-link:hover{ color:var(--cinnabar-600); border-bottom-color:var(--cinnabar-600); }
+.footer-rule{ width:1px; height:12px; background:var(--ink-300); }
+.footer-tag{ letter-spacing:.15em; }
+
+/* ============ 9. 解析弹窗 Modal（v3.5：全端按 430px 容器三段式布局；≤640 全屏） ============ */
+.modal{
+  position:fixed; inset:0; z-index:100;
+  display:flex; align-items:center; justify-content:center;
+  padding:24px;
+  visibility:hidden; opacity:0;
+  transition:opacity .22s ease, visibility .22s ease;
+}
+.modal.open{ visibility:visible; opacity:1; }
+.modal-overlay{
+  position:absolute; inset:0;
+  background:rgba(20,17,12,.46);   /* 暖墨遮罩 */
+}
+.modal-panel{
+  position:relative; z-index:2;
+  /* v3.7.4：弹窗去掉签文框（签文卡已显示完整签文），只显示释义区。
+     宽度仍对齐 430 容器；高度 auto 自适应内容（不再固定 560px），max-height 限制 */
+  width:min(430px, 92vw);
+  height:auto;
+  max-height:calc(100dvh - 64px);
+  overflow:hidden;
+  background:var(--paper-card);
+  background-image:var(--paper-noise);
+  /* 文武线框（2px/5px 加强）+ 弹层投影 */
+  box-shadow:
+    inset 0 0 0 2px var(--line-strong),
+    inset 0 0 0 5px var(--paper-card),
+    inset 0 0 0 6px var(--line-faint),
+    0 4px 24px rgba(20,17,12,.20);
+  /* v3.7.4：padding 加大（上 24 给关闭按钮+头部留白，左右 18，下 18） */
+  padding:24px 18px 18px;
+  /* v3.7.4：grid 双栏 —— 头部（左列）+ meta（右列），不再有签文区 */
+  display:grid;
+  grid-template-columns:auto 1fr;
+  grid-template-rows:1fr;
+  grid-template-areas:"head meta";
+  gap:6px 14px;
+  transform:translateY(8px);
+  transition:transform .25s var(--flip-ease);
+}
+.modal.open .modal-panel{ transform:none; }
+.modal-pattern{ position:absolute; inset:0; width:100%; height:100%; opacity:.06; pointer-events:none; }
+/* v3.7.4：关闭按钮加大 36→44px，border 2px 加粗，颜色 ink-700→ink-800 更醒目，
+   字符改用「✕」更直观（v3.3 时期用「阖」古字过于含蓄） */
+.modal-close{
+  position:absolute; top:16px; right:16px;
+  appearance:none; border:2px solid var(--ink-700); background:var(--paper-bg);
+  color:var(--ink-800); font-family:var(--font-song); font-size:20px; font-weight:600;
+  width:44px; height:44px; cursor:pointer; border-radius:0;
+  letter-spacing:0; line-height:1; padding:0;
+  touch-action:manipulation;   /* v3.4：触屏即时响应 */
+  transition:border-color .25s ease, color .25s ease, background-color .25s ease;
+  display:flex; align-items:center; justify-content:center;
+  z-index:5;                                    /* v3.7.4：上提 z-index 防被头部覆盖 */
+}
+.modal-close:hover{
+  border-color:var(--cinnabar-600); color:var(--paper-bright); background:var(--cinnabar-600);
+}
+.modal-close:focus-visible{ outline:2px solid var(--cinnabar-600); outline-offset:3px; }
+
+/* 头部：解曰 + 吉凶印章 + 第X签 + 解印落款（v3.7.4：grid head 区只占第一行 1 行，
+   4 件垂直堆叠成"左侧装饰条"，与右侧 meta 共用版心高度；
+   padding-top 32px 给右上角关闭按钮留位） */
+/* v3.7.4.2：头部改横向 row 布局，让"解曰+吉凶印章"并排、"签号+解印"并排，
+   两组横向排列（一行宽度不够时换行），不再 4 件垂直堆叠 */
+.modal-head{
+  grid-area:head;
+  align-items:center; justify-content:flex-start;
+  gap:10px; margin-bottom:0; padding-bottom:0;
+  padding-right:8px; padding-top:8px;          /* v3.7.4：避开关闭按钮 */
+  flex-shrink:0;
+  border-right:1px solid var(--line-faint);
+  padding-left:2px;
+}
+.modal-head-left{ display:flex; flex-direction:row; gap:10px; align-items:center; }
+.modal-head-right{ display:flex; flex-direction:row; gap:10px; align-items:center; }
+.modal-title{
+  writing-mode:vertical-rl; text-orientation:mixed;
+  font-family:var(--font-song); font-weight:600; font-size:26px;
+  letter-spacing:.3em; color:var(--ink-800);
+  line-height:1;
+}
+.modal .fortune-label{ width:26px; height:62px; }      /* v3.7.4.3：52→62 加高 10px，更醒目 */
+.modal .label-chars{ font-size:12px; gap:5px; letter-spacing:.05em; font-weight:600; }
+.modal-no{
+  font-family:var(--font-fang); font-size:13px; font-weight:600;
+  letter-spacing:.3em; color:var(--ink-600);
+  padding:1px 0;
+}
+.modal-top .modal-no{ color:var(--cinnabar-600); }
+.modal-mid .modal-no{ color:var(--daiqing-600); }
+.modal-low .modal-no{ color:var(--xuan-500); }
+.seal-jie{ width:32px; height:32px; font-size:12px; letter-spacing:.18em; font-weight:600; }
+
+/* v3.7.4：弹窗去掉签文框和鱼尾栏线（签文卡已显示完整签文），仅显示头部 + meta 释义区；
+   以下 .modal-fish / .modal-verse-frame / .modal-verse 样式保留以防历史回退，但 v3.7.4 不再使用 */
+.modal-fish{
+  display:none;
+}
+
+/* 主体（v3.7.2d：内含 meta 元信息） */
+.modal-body{
+  display:contents;                                /* v3.7.2d：让 .modal-body 子元素直接参与 modal-panel grid */
+}
+/* v3.7.4：以下签文框相关样式保留注释但不再渲染（HTML 已删除 .modal-verse-frame） */
+.modal-verse-frame{ display:none !important; }
+.modal-verse{ display:none !important; }
+
+/* 元信息（v3.7.4：弹窗去掉签文框后，meta 占右栏全部空间，三段垂直堆叠让释义突出） */
+/* v3.7.4.2：meta 区 padding-top:40px 让出右上角关闭按钮位置（之前 padding:6px 文字被挡） */
+.modal-meta{
+  grid-area:meta;
+  flex:1 1 auto; min-height:0;
+  display:flex; flex-direction:column; align-items:flex-start; justify-content:center;
+  gap:14px; padding:40px 4px 6px;                /* v3.7.4.2：top 6→40 让出 ✕ 按钮 */
+  flex-wrap:nowrap;
+}
+.modal-meta > .modal-info,
+.modal-meta > .modal-source,
+.modal-meta > .modal-tier{
+  display:flex; align-items:flex-start; gap:8px;
+  font-size:13px;
+  position:relative;
+  flex-shrink:0;
+}
+/* v3.7.4：垂直堆叠不需要 | 分隔符；用 border-left 短装饰替代 */
+/* 释义特别加大字号 */
+.modal-info{ font-size:15px; }
+.modal-info .modal-vern{ font-size:15px; line-height:1.7; }
+.modal-source{ font-size:13px; }
+.modal-tier{ font-size:13px; }
+/* 用 ::before 加左侧装饰条 */
+.modal-meta > .modal-info::before,
+.modal-meta > .modal-source::before,
+.modal-meta > .modal-tier::before{
+  content:''; display:inline-block; width:3px; height:1em;
+  background:var(--ink-300); margin-top:0.2em; flex-shrink:0;
+}
+/* 释文（v3.7.4：释文加大字号 13→16px 突出显示，左侧短装饰条对齐） */
+.modal-vern-label{
+  flex-shrink:0;
+  width:24px; height:24px;
+  display:flex; align-items:center; justify-content:center;
+  border:1px solid var(--line-normal);
+  font-family:var(--font-kai); font-weight:600; font-size:13px;
+  letter-spacing:.05em; color:var(--ink-700);
+}
+.modal-vern{
+  font-family:var(--font-fang); font-size:16px; line-height:1.8;
+  color:var(--ink-800);
+  flex:1 1 auto;
+}
+.modal-vern:not(:empty)::after{ content:'。'; color:var(--ink-300); }
+
+/* 出处 */
+.modal-source{
+  flex:0 0 auto;
+}
+.modal-source-tag{
+  flex-shrink:0;
+  font-family:var(--font-fang); font-size:12px; letter-spacing:.25em;
+  color:var(--ink-500);
+  min-width:48px;                                  /* v3.7.4：让标签宽度一致 */
+}
+.modal-source-text{
+  font-family:var(--font-fang); font-size:13px; letter-spacing:.08em;
+  color:var(--ink-600); line-height:1.5;
+  flex:1 1 auto;
+}
+
+/* 吉凶说明（v3.7.4：徽章式标签 + 文字） */
+.modal-tier{
+  flex:0 0 auto;
+  font-family:var(--font-kai); font-size:14px;
+  letter-spacing:.06em; color:var(--ink-700); line-height:1.6;
+  flex:1 1 auto;
+}
+.modal-tier::before{ display:none !important; }   /* v3.7.4：去掉 v3.7 鱼尾栏线 */
+.tier-label{
+  flex-shrink:0;
+  font-family:var(--font-fang); font-size:12px;
+  letter-spacing:.25em; color:var(--ink-500);
+  margin-right:10px;
+  border:1px solid var(--line-normal);
+  padding:3px 8px;
+  min-width:48px; text-align:center;
+  background:var(--paper-bright);
+}
+/* v3.7.4.4：删除 .tier-dot 小圆点（吉凶前不再显示装饰点，与 HTML 同步移除） */
+
+/* ============ 9.5 响应式 Responsive（v3.5：全端单页基础之上，仅小屏细化） ============ */
+@media (max-width:640px){
+  /* 移动端字号降一档（clamp 生效） */
+  :root{
+    --fs-cover:clamp(36px,8vw,52px);
+    --fs-title:clamp(26px,5vw,34px);
+    --fs-answer:clamp(20px,4.4vw,26px);
+    --fs-lead:17px;
+    --fs-label:15px;
+    --fs-note:14px;
+    --fs-micro:12px;
+    --flip-duration:700ms;   /* 移动端翻页提速 */
+  }
+  /* 移动端隐藏右上角题签（避免压输入框「問」字 / 顶部拥挤） */
+  .stage-colophon{ display:none; }
+  /* v3.5：弹窗全屏（三段式布局已升为全端基础） */
+  .modal{
+    padding:
+      max(16px, env(safe-area-inset-top))
+      12px
+      max(16px, env(safe-area-inset-bottom));
+    align-items:center;                  /* v3.7.4.3：stretch→center 弹窗垂直居中（不再贴顶） */
+  }
+/* v3.7.4.2：弹窗在移动端不要撑满整屏高度 —— height:100% 改为 auto，
+   max-height 限定为视口高度的 60%（约 500px @ 846dvh），避免内容少时弹窗太高留白 */
+.modal-panel{
+  width:100%; height:auto;
+  max-height:min(560px, calc(100dvh - 64px));
+  padding:18px 16px 16px;
+}
+}
+
+/* ============ 10. 无障碍：减弱动效（淡入 300ms） ============ */
+@media (prefers-reduced-motion: reduce){
+  /* 扉页直显：face-back 去旋转（避免镜像），改用透明度在正/背两面间切换（P1-2） */
+  .flip-face .face{ transition:opacity 200ms ease !important; }
+  .face-back{ transform:none !important; }
+  .flip-face .face-back{ opacity:0 !important; }
+  .flip-face .face-front{ opacity:1 !important; }
+  .flip-face.show-back .face-back{ opacity:1 !important; }
+  .flip-face.show-back .face-front{ opacity:0 !important; }
+  .flip-face{ transition:opacity 300ms ease !important; }
+  .flip-face.flipped{ transform:none !important; opacity:0 !important; }
+  .page-right{ transition:opacity 300ms ease !important; }
+  .page-right.turning{ transform:none !important; opacity:.3 !important; }
+  .btn-ask{ transition:none !important; }
+  .modal{ transition:none !important; }
+  .modal-panel{ transform:none !important; transition:none !important; }
+  .flip-face, .page-right{ transition-duration:300ms !important; }
+  /* v3.4：减弱动效下禁用前缘高光/书堆呼吸 */
+  .flip-sheen{ opacity:0 !important; transform:none !important; transition:none !important; }
+  .book{ transition:none !important; box-shadow:none !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- 纹样定义（内联 SVG defs，供 url(#...) 引用） -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <!-- 祥云纹（上上签 / 背景云纹水印） -->
+    <pattern id="p-cloud" width="56" height="56" patternUnits="userSpaceOnUse">
+      <path d="M16 40 C6 34 8 22 18 20 C20 10 38 8 40 18 C50 18 52 34 40 38 C36 46 24 48 16 40 Z" fill="none" stroke="currentColor" stroke-width="1.4"/>
+      <path d="M32 32 c6 -6 16 -4 16 6" fill="none" stroke="currentColor" stroke-width="1.2"/>
+      <circle cx="24" cy="30" r="1.6" fill="currentColor" stroke="none"/>
+      <path d="M44 16 c3 -4 10 -4 13 -1" fill="none" stroke="currentColor" stroke-width="1.2"/>
+    </pattern>
+    <!-- 回纹（中平） -->
+    <pattern id="p-hui" width="16" height="16" patternUnits="userSpaceOnUse">
+      <path d="M3 3 H13 V13 H7 V7 H3 Z" fill="none" stroke="currentColor" stroke-width="1.1"/>
+    </pattern>
+    <!-- 水波纹（下签） -->
+    <pattern id="p-water" width="28" height="12" patternUnits="userSpaceOnUse">
+      <path d="M0 7 Q7 1 14 7 T28 7" fill="none" stroke="currentColor" stroke-width="1.1"/>
+    </pattern>
+  </defs>
+</svg>
+
+<!-- v3.5 背景装饰层（纸色渐变 + 云纹 + 远山 + 印章水印 + 竖排大字「乾坤一冊」；
+     整层 pointer-events:none 不挡交互，aria-hidden 供屏幕阅读器忽略） -->
+<div class="bg-deco" aria-hidden="true">
+  <svg class="deco-cloud" preserveAspectRatio="none"><rect width="100%" height="100%" fill="url(#p-cloud)"/></svg>
+  <svg class="deco-mountain" viewBox="0 0 1200 300" preserveAspectRatio="xMidYMax slice">
+    <g fill="none" stroke="currentColor">
+      <path stroke-width="2" d="M0 300 L150 118 L262 222 L400 88 L522 242 L642 138 L782 232 L922 96 L1062 212 L1202 158 L1200 300 Z"/>
+      <path stroke-width="1.3" opacity=".6" d="M0 300 L212 192 L344 272 L522 210 L702 282 L862 198 L1032 262 L1200 228 L1200 300 Z"/>
+    </g>
+  </svg>
+  <span class="deco-seal"><i>知天命</i></span>
+  <span class="deco-title">乾坤一冊</span>
+</div>
+
+<main class="stage">
+  <span class="stage-colophon" aria-hidden="true">問心一册 · 丙午</span>
+
+  <!-- v3 提问输入：古籍便笺，回车或翻书选签；留空则全库随机（问题不显示在签文卡） -->
+  <div class="question-wrap">
+    <input type="text" class="question-field" id="questionInput"
+           placeholder="默想心中之问，或留空白…" aria-label="输入心中之问，可留空"
+           autocomplete="off" spellcheck="false" maxlength="60">
+    <span class="question-mark" aria-hidden="true">問</span>
+  </div>
+
+  <div class="book-wrap">
+    <!-- 书堆假页 -->
+    <div class="book-stack" aria-hidden="true">
+      <span class="stack-layer l1"></span>
+      <span class="stack-layer l2"></span>
+      <span class="stack-layer l3"></span>
+      <span class="stack-layer l4"></span>
+    </div>
+
+    <!-- 书：v3.5 全端单页（签文卡），封面翻页覆盖整页；桌面双页左页引导已移除 -->
+    <div class="book" id="book" role="button" tabindex="0" aria-label="答案之书，默想心中之问，轻触翻书得签">
+
+      <!-- 签文卡 -->
+      <div class="page page-right" id="slipPage">
+        <div class="slip slip-mid" id="slip">
+          <svg class="slip-pattern" aria-hidden="true"><rect width="100%" height="100%" fill="url(#p-hui)"/></svg>
+
+          <!-- 档位装饰：祥云（上上） -->
+          <svg class="orn-cloud" viewBox="0 0 120 80" aria-hidden="true">
+            <g fill="none" stroke="currentColor" stroke-width="1.6">
+              <path d="M24 62 C10 56 8 36 22 32 C22 18 44 12 48 26 C62 22 78 30 74 44 C88 46 90 66 72 68 L24 68 Z"/>
+              <path d="M44 40 c10 -10 26 -7 26 9"/>
+              <circle cx="34" cy="38" r="2.2" fill="currentColor" stroke="none"/>
+              <path d="M60 22 c4 -5 12 -5 16 -1"/>
+            </g>
+          </svg>
+          <!-- 档位装饰：回纹（中平）上下栏线 -->
+          <svg class="orn-hui orn-hui-top" preserveAspectRatio="none" aria-hidden="true"><rect width="100%" height="100%" fill="url(#p-hui)"/></svg>
+          <svg class="orn-hui orn-hui-bot" preserveAspectRatio="none" aria-hidden="true"><rect width="100%" height="100%" fill="url(#p-hui)"/></svg>
+          <!-- 档位装饰：水波纹（下）地脚横线 -->
+          <svg class="orn-wave" preserveAspectRatio="none" aria-hidden="true"><rect width="100%" height="100%" fill="url(#p-water)"/></svg>
+
+          <!-- 天头：签号 + 吉凶标 -->
+          <div class="slip-head">
+            <span class="slip-no" id="slipNo">第壹签</span>
+            <span class="fortune-label fortune-mid" id="fortuneLabel" aria-label="中平签">
+              <svg class="label-pattern" aria-hidden="true"><rect width="100%" height="100%" fill="url(#p-hui)"/></svg>
+              <span class="label-chars"><i>中</i><i>平</i><i>签</i></span>
+            </span>
+          </div>
+
+          <!-- 中部：竖排签文 -->
+          <div class="slip-body" id="slipText" aria-live="polite">学而时习之，不亦说乎</div>
+
+          <!-- 地脚：出处（竖排） + 小印（白话短注已收进「解曰」弹窗，問心堂落款与页脚重复已移除以紧凑布局） -->
+          <div class="slip-foot">
+            <span class="slip-note" id="slipNote">——《论语·学而》</span>
+            <span class="seal seal-sm" aria-hidden="true"><i>知</i></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 翻页封面（初始覆盖整页） -->
+      <div class="flip-face" id="cover">
+        <div class="flip-sheen" aria-hidden="true"></div>
+        <div class="face face-front">
+          <div class="cover-frame"></div>
+          <svg class="cover-pattern" aria-hidden="true"><rect width="100%" height="100%" fill="url(#p-cloud)"/></svg>
+          <div class="cover-content">
+            <h1 class="cover-title">答案之书</h1>
+            <p class="cover-sub">問天 · 問己 · 問心</p>
+            <span class="seal seal-lg" aria-hidden="true"><i>知</i><i>天</i><i>命</i></span>
+            <p class="cover-hint">默想心中之问 · 轻触翻书</p>
+          </div>
+        </div>
+        <div class="face face-back">
+          <span class="inner-head">問心</span>
+          <div class="inner-content">
+            <div class="inner-title">默想心中之问</div>
+            <div class="inner-note">一念起 · 萬法生</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 控件 -->
+  <section class="controls">
+    <button class="btn-jie" id="jieBtn" type="button">解曰</button>
+    <button class="btn-ask" id="askBtn" type="button">再问一签</button>
+  </section>
+</main>
+
+<footer class="footer">
+  <span class="seal seal-sm" aria-hidden="true"><i>問</i></span>
+  <a class="footer-link" href="https://git.priest.ink" target="_blank" rel="noopener">git.priest.ink</a>
+  <span class="footer-rule" aria-hidden="true"></span>
+  <span class="footer-tag">乾坤一册 · 问心自答</span>
+</footer>
+
+<noscript><p style="text-align:center;padding:40px;color:#7A7162;">此工具需要启用 JavaScript 以翻书取签。</p></noscript>
+
+<!-- v3.2 解析弹窗（解曰·纸色层次 + 文武线加粗 + 印泥深化 + 第X签 + 解印落款） -->
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal-overlay" id="modalOverlay"></div>
+  <div class="modal-panel modal-mid" id="modalPanel" role="document">
+    <svg class="modal-pattern" aria-hidden="true"><rect width="100%" height="100%" fill="url(#p-hui)"/></svg>
+    <button class="modal-close" id="modalClose" type="button" aria-label="关闭解析">✕</button>
+    <div class="modal-head">
+      <span class="modal-title" id="modalTitle">解曰</span>
+      <span class="fortune-label fortune-mid" id="modalFortune" aria-label="中平签"></span>
+    </div>
+    <!-- v3.7.4：去掉签文框和鱼尾栏线（签文卡已显示完整签文，弹窗只显示释义） -->
+    <div class="modal-body">
+      <div class="modal-meta">
+        <span class="modal-info"><span class="modal-vern-label" aria-hidden="true">释</span><span class="modal-vern" id="modalVern"></span></span>
+        <span class="modal-source"><span class="modal-source-tag">出典</span><span class="modal-source-text" id="modalSource"></span></span>
+        <span class="modal-tier" id="modalTier"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ============ 签文库（约 500 条，外置 ansbook-slips.js → window.ANSBOOK_SLIPS） ============ */
+  /* v3.4：数据文件缺失/加载失败时启用内嵌兜底签文库，保证封面点击永远可用（修复「手机点击无反应」根因之一） */
+  var FALLBACK_SLIPS = [
+    {t:"有朋自远方来，不亦乐乎", f:"top", s:"论语·学而", n:"好友远道而来，多么高兴"},
+    {t:"德不孤，必有邻", f:"top", s:"论语·里仁", n:"有德之人，必有良伴"},
+    {t:"见贤思齐，见不贤而内自省也", f:"top", s:"论语·里仁", n:"见贤学齐，见劣自省"},
+    {t:"学而不思则罔，思而不学则殆", f:"mid", s:"论语·为政", n:"学思并重，方得其道"},
+    {t:"三人行，必有我师焉", f:"mid", s:"论语·述而", n:"虚心向学，处处有师"},
+    {t:"己所不欲，勿施于人", f:"mid", s:"论语·卫灵公", n:"推己及人，仁者之心"},
+    {t:"知者不惑，仁者不忧，勇者不惧", f:"mid", s:"论语·子罕", n:"三达德备，内心自安"},
+    {t:"三思而后行", f:"low", s:"论语·公冶长", n:"谋定后动，慎始敬终"},
+    {t:"欲速则不达", f:"low", s:"论语·子路", n:"戒急用忍，徐图有成"},
+    {t:"君子坦荡荡，小人长戚戚", f:"mid", s:"论语·述而", n:"坦荡自持，不忧不惧"}
+  ];
+  var SLIPS = (window.ANSBOOK_SLIPS && window.ANSBOOK_SLIPS.length) ? window.ANSBOOK_SLIPS : null;
+  if(!SLIPS){
+    SLIPS = FALLBACK_SLIPS;
+    /* eslint-disable no-console */
+    if(window.console && console.warn) console.warn('答案之书：签文库 ansbook-slips.js 未加载，已启用内嵌兜底签文库（' + FALLBACK_SLIPS.length + ' 条）。');
+    /* eslint-enable no-console */
+  }
+
+  /* ============ 吉凶元数据 ============ */
+  var FORTUNE = {
+    top:{ chars:['上','上','签'], cls:'fortune-top', pat:'p-cloud', aria:'上上签' },
+    mid:{ chars:['中','平','签'], cls:'fortune-mid', pat:'p-hui',   aria:'中平签' },
+    low:{ chars:['下','签'],       cls:'fortune-low', pat:'p-water', aria:'下签' }
+  };
+
+  /* 数字转大写中文（签号，按实际条数动态，支持至 999 → 第伍佰签等） */
+  var CN = ['零','壹','贰','叁','肆','伍','陆','柒','捌','玖'];
+  function cnNum(n){
+    if(n < 10) return CN[n];
+    if(n < 100){
+      var t = Math.floor(n/10), o = n%10;
+      return (t===1 ? '壹拾' : CN[t]+'拾') + (o ? CN[o] : '');
+    }
+    var h = Math.floor(n/100), r = n%100, s = CN[h]+'佰';
+    if(r === 0) return s;
+    if(r < 10) return s + '零' + CN[r];
+    var t = Math.floor(r/10), o = r%10;
+    return s + (t===1 ? '壹拾' : CN[t]+'拾') + (o ? CN[o] : '');
+  }
+
+  /* ============ 动效参数 ============ */
+  var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var FLIP_MS = reduced ? 300 : (window.innerWidth < 640 ? 700 : 900);
+  var TURN_HALF = reduced ? 150 : 400;
+
+  /* ============ DOM ============ */
+  var book       = document.getElementById('book');
+  var cover      = document.getElementById('cover');
+  var slipPage   = document.getElementById('slipPage');
+  var slip       = document.getElementById('slip');
+  var slipNo     = document.getElementById('slipNo');
+  var slipText   = document.getElementById('slipText');
+  var slipNote   = document.getElementById('slipNote');
+  var fortuneLabel = document.getElementById('fortuneLabel');
+  var askBtn     = document.getElementById('askBtn');
+  var jieBtn     = document.getElementById('jieBtn');
+  var questionInput = document.getElementById('questionInput');
+  var stage      = document.querySelector('.stage');   /* v3.3：翻书后输入框淡出塌陷用 */
+  var modal      = document.getElementById('modal');
+  var modalOverlay = document.getElementById('modalOverlay');
+  var modalClose = document.getElementById('modalClose');
+  var modalPanel = document.getElementById('modalPanel');
+  var modalFortune = document.getElementById('modalFortune');
+  /* v3.7.4.5：modalNo 已随"第X签"元素一并删除（v3.7.4.3），不再声明 */
+  /* v3.7.4：modalVerse / modalVerseFrame 已随签文框一并删除（弹窗只显示释义），不再声明 */
+  var modalVern  = document.getElementById('modalVern');
+  var modalSource = document.getElementById('modalSource');
+  var modalTier  = document.getElementById('modalTier');
+  var modalPattern = modal.querySelector('.modal-pattern');
+
+  var lastIdx = -1, revealed = false, busy = false, current = null, currentIdx = -1, lastFocus = null;
+
+  /* ============ 吉凶档说明（v3 解曰弹窗用；v3.4 升级为气质化引导模板，不编造具体断语） ============ */
+  var FORTUNE_DESC = {
+    top: '上上签 · 此签主吉庆进取，宜乘势而行',
+    mid: '中平签 · 此签主平稳中和，宜静守待时',
+    low: '下签 · 此签主慎思缓行，宜敛藏蓄势'
+  };
+  /* v3.7.4.4：TIER_COLOR / tierColor 仅被已删除的 tier-dot 使用，一并移除 */
+
+  /* ============ v3 主题匹配（本地关键词 → 来源典籍池） ============ */
+  var TOPICS = {
+    '谋略·进取': { kw:['事业','前程','升迁','工作','职场','创业','面试','升职','求职','发展','前途'], grp:['左传','三国演义','周易'] },
+    '情感·际遇': { kw:['姻缘','爱情','感情','婚姻','对象','恋爱','婚配','良缘','伴侣','婚恋'], grp:['诗经','红楼梦'] },
+    '损益·时运': { kw:['财运','生意','金钱','财富','投资','盈亏','求财'], grp:['尚书','周易','大学'] },
+    '治学·修养': { kw:['学业','考试','读书','学习','功名','学问','修身','求学','科考','教养'], grp:['论语','大学','中庸','礼记'] },
+    '养生·安危': { kw:['健康','身体','疾病','康复','养生','伤病','安康','病愈'], grp:['尚书','礼记'] },
+    '行止·出行': { kw:['出行','远行','旅行','搬迁','外出','移居','远游','行程'], grp:['周易','左传'] },
+    '家国·亲情': { kw:['家宅','家庭','亲人','父母','子女','兄弟','家人','家族','家和'], grp:['大学','孟子','尚书'] },
+    '警慎·是非': { kw:['官司','纠纷','是非','口舌','诉讼','麻烦','小人','灾祸','是非口舌'], grp:['左传','水浒传','红楼梦'] },
+    '时运·总览': { kw:['运势','命运','时运','吉凶','问事','流年','运程','气运'], grp:['周易','中庸'] }
+  };
+
+  /* 按 s 出处归一为「来源组」（覆盖数据中的全部前缀；春秋·左传 → 左传） */
+  function srcGroup(s){
+    if(!s) return '';
+    if(s.indexOf('春秋·左传')===0) return '左传';
+    if(s.indexOf('论语')===0) return '论语';
+    if(s.indexOf('孟子')===0) return '孟子';
+    if(s.indexOf('大学')===0) return '大学';
+    if(s.indexOf('中庸')===0) return '中庸';
+    if(s.indexOf('诗经')===0) return '诗经';
+    if(s.indexOf('尚书')===0) return '尚书';
+    if(s.indexOf('礼记')===0) return '礼记';
+    if(s.indexOf('周易')===0) return '周易';
+    if(s.indexOf('三国演义')===0) return '三国演义';
+    if(s.indexOf('水浒传')===0) return '水浒传';
+    if(s.indexOf('西游记')===0) return '西游记';
+    if(s.indexOf('红楼梦')===0) return '红楼梦';
+    if(s.indexOf('史记')===0) return '史记';
+    if(s.indexOf('三国志')===0) return '三国志';
+    return '';
+  }
+  var SLIP_GROUP = [];
+  for(var gi=0; SLIPS && gi<SLIPS.length; gi++){ SLIP_GROUP.push(srcGroup(SLIPS[gi].s)); }
+
+  function matchTopic(question){
+    if(!question) return null;
+    var q = question.replace(/\s+/g, '');
+    for(var key in TOPICS){
+      var t = TOPICS[key];
+      for(var k=0; k<t.kw.length; k++){
+        if(q.indexOf(t.kw[k]) !== -1) return key;
+      }
+    }
+    return null;
+  }
+  function poolIndices(key){
+    var t = TOPICS[key];
+    if(!t || !SLIPS) return [];
+    var out = [];
+    for(var i=0; i<SLIPS.length; i++){
+      for(var g=0; g<t.grp.length; g++){
+        if(SLIP_GROUP[i] === t.grp[g]){ out.push(i); break; }
+      }
+    }
+    return out;
+  }
+
+  /* ============ 抽取（去重：禁止连续同签） ============ */
+  function pickAll(){
+    if(!SLIPS || SLIPS.length <= 1){ lastIdx = 0; return 0; }
+    var i;
+    do { i = Math.floor(Math.random() * SLIPS.length); } while(i === lastIdx);
+    lastIdx = i;   /* 记录本次索引，禁止下一次连出同签（P0-1） */
+    return i;
+  }
+  function pickFromPool(pool){
+    if(!pool || !pool.length) return pickAll();
+    /* 池内去重：最多尝试 8 次避免死循环 */
+    for(var t=0; t<8; t++){
+      var i = pool[Math.floor(Math.random() * pool.length)];
+      if(i !== lastIdx){ lastIdx = i; return i; }
+    }
+    for(var k=0; k<pool.length; k++){
+      if(pool[k] !== lastIdx){ lastIdx = pool[k]; return pool[k]; }
+    }
+    lastIdx = pool[0]; return pool[0];
+  }
+
+  /* ============ v3 AI 匹配接口（预留，不接真实 API） ============
+     外部可注入 window.ANSBOOK_MATCHER，抽签优先调用；未注入 / 返回 null / 抛异常 → 回退本地关键词匹配。
+     注入示例：
+       window.ANSBOOK_MATCHER = async function(question){
+         // const r = await fetch('/api/match', { method:'POST',
+         //        headers:{'Content-Type':'application/json'},
+         //        body: JSON.stringify({ q: question }) });
+         // const d = await r.json();
+         // return d.topicKey;      // ① 返回主题 key（如 '谋略·进取' / '时运·总览'）
+         // return [3, 17, 88];     // ② 返回候选签文索引数组
+         // return null;            // ③ 回退本地匹配
+       };
+     注意：签文卡不展示问题文本，问题仅用于选签。 */
+  async function pickIdx(question){
+    if(!SLIPS || !SLIPS.length) return 0;
+    /* 1) AI 接口优先 */
+    if(window.ANSBOOK_MATCHER && typeof window.ANSBOOK_MATCHER === 'function'){
+      try{
+        var r = await window.ANSBOOK_MATCHER(question || '');
+        if(typeof r === 'number' && r >= 0 && r < SLIPS.length){ lastIdx = r; return r; }
+        if(typeof r === 'string' && r){
+          var p1 = poolIndices(r);
+          if(p1.length) return pickFromPool(p1);
+        }
+        if(Array.isArray(r) && r.length){
+          var p2 = r.filter(function(x){ return typeof x === 'number' && x >= 0 && x < SLIPS.length; });
+          if(p2.length) return pickFromPool(p2);
+        }
+      }catch(e){ /* AI 异常 → 回退本地 */ }
+    }
+    /* 2) 本地关键词匹配 */
+    var key = matchTopic(question);
+    if(key){
+      var pool = poolIndices(key);
+      if(pool.length) return pickFromPool(pool);
+    }
+    /* 3) 全库随机 */
+    return pickAll();
+  }
+
+  /* ============ 渲染 ============ */
+  function renderLabelInto(el, f){
+    var m = FORTUNE[f];
+    var chars = '';
+    for(var k=0; k<m.chars.length; k++){ chars += '<i>' + m.chars[k] + '</i>'; }
+    el.className = 'fortune-label ' + m.cls;
+    el.setAttribute('aria-label', m.aria);
+    el.innerHTML =
+      '<svg class="label-pattern" aria-hidden="true"><rect width="100%" height="100%" fill="url(#' + m.pat + ')"/></svg>' +
+      '<span class="label-chars">' + chars + '</span>';
+  }
+  function renderLabel(f){ renderLabelInto(fortuneLabel, f); }
+  function renderSlip(idx){
+    if(!SLIPS || !SLIPS[idx]) return;
+    var s = SLIPS[idx];
+    current = s;            /* 记录当前签，供「解曰」弹窗读取 */
+    currentIdx = idx;        /* v3.2：同时记录索引，供弹窗「第X签」显示 */
+    slip.className = 'slip slip-' + s.f;
+    slipNo.textContent   = '第' + cnNum(idx+1) + '签';
+    slipText.textContent = s.t;
+    slipNote.textContent = s.s ? '——《' + s.s + '》' : '';
+    /* 长签文（>10 字）降一档字号，避免与天头/地脚拥挤（P1-3） */
+    slipText.classList.toggle('long', s.t.replace(/[，。、；：《》「」·]/g, '').length > 10);
+    /* 卡面水印纹样随档位更新：上上→祥云 / 中平→回纹 / 下→水波（v3.1 P1-1） */
+    var patRect = slip.querySelector('.slip-pattern rect');
+    if(patRect) patRect.setAttribute('fill', 'url(#' + FORTUNE[s.f].pat + ')');
+    renderLabel(s.f);
+  }
+
+  /* ============ 交互 ============ */
+  function readQuestion(){
+    return questionInput ? (questionInput.value || '').trim() : '';
+  }
+  async function openBook(){
+    if(busy || !SLIPS) return;
+    busy = true;
+    renderSlip(await pickIdx(readQuestion()));   /* 先渲染在封面之下（含问题选签） */
+    book.classList.add('flipping');   /* v3.4：翻书高光/书脊阴影 */
+    if(reduced){
+      /* 无障碍模式：先以透明度切换显示扉页（约 400ms 停留），再整体淡出（P1-2） */
+      cover.classList.add('show-back');
+      setTimeout(function(){ cover.classList.add('flipped'); }, 300);
+      setTimeout(function(){ cover.classList.add('gone'); book.classList.remove('flipping'); afterOpen(); }, 620);
+    } else {
+      /* 常规：封面翻转 -180°；.gone 的 visibility 延迟 --flip-duration 生效，扉页可见停留约半程（P1-1） */
+      cover.classList.add('flipped');
+      cover.classList.add('gone');
+      setTimeout(function(){ afterOpen(); }, FLIP_MS + 60);
+      setTimeout(function(){ book.classList.remove('flipping'); }, FLIP_MS + 200);
+    }
+  }
+  function afterOpen(){
+    revealed = true; busy = false;
+    book.classList.add('opened');
+    if(stage) stage.classList.add('opened');   /* v3.3：触发输入框淡出塌陷，签文卡完整露出 */
+    askBtn.classList.add('visible');
+    jieBtn.classList.add('visible');
+  }
+  async function askAgain(){
+    if(busy || !SLIPS) return;
+    busy = true;
+    var idx = await pickIdx(readQuestion());
+    book.classList.add('flipping');   /* v3.4：次翻转同样触发书脊阴影 */
+    if(reduced){
+      slipPage.classList.add('turning');
+      setTimeout(function(){ renderSlip(idx); slipPage.classList.remove('turning'); book.classList.remove('flipping'); busy = false; }, 320);
+    } else {
+      slipPage.classList.add('turning');
+      setTimeout(function(){ renderSlip(idx); }, TURN_HALF + 20);   /* 翻至立起时换内容 */
+      setTimeout(function(){ slipPage.classList.remove('turning'); }, TURN_HALF + 40);
+      setTimeout(function(){ busy = false; book.classList.remove('flipping'); }, TURN_HALF * 2 + 80);
+    }
+  }
+  function trigger(){
+    if(!SLIPS) return;
+    /* v3.4：收起软键盘，避免底栏控件（解曰/再问一签）被键盘遮挡而「点不到」 */
+    if(questionInput && document.activeElement === questionInput){ questionInput.blur(); }
+    if(revealed) askAgain(); else openBook();
+  }
+
+  /* ============ v3.2 解析弹窗（解曰） ============ */
+  function openModal(){
+    if(!current) return;
+    /* v3.2：modal-panel 加档位 class（控制签号字色/纹样底色），保证 modalSource 文本安全（textContent） */
+    modalPanel.className = 'modal-panel modal-' + current.f;
+    /* v3.7.4.5：modalNo（第X签）已删除，不再赋值 */
+    /* v3.7.4：modalVerse 已删除（签文卡已显示签文，弹窗只显示释义） */
+    modalVern.textContent  = current.n || '';
+    /* v3.2：出处文本包在 modal-source-text 内，纯文本写入，避免拆字/转义（数据 bug 修复验证点） */
+    var srcText = current.s ? ('《' + current.s + '》') : '';
+    modalSource.textContent = srcText;
+    /* v3.7.4.4：删除吉凶前的小圆点 tier-dot（用户反馈不需要该装饰） */
+    modalTier.innerHTML = '<span class="tier-label">吉凶</span>' + (FORTUNE_DESC[current.f] || '');
+    renderLabelInto(modalFortune, current.f);
+    modalPattern.querySelector('rect').setAttribute('fill', 'url(#' + FORTUNE[current.f].pat + ')');
+    /* v3.7.4：modalVerse / modalVerseFrame 已删除，签文框相关的 .long/.compact 类不再需要 */
+    lastFocus = document.activeElement;
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    /* 延迟聚焦关闭钮：避开点击事件收尾对焦点的重设（真实用户与自动化测试均生效） */
+    setTimeout(function(){ if(modal.classList.contains('open')) modalClose.focus(); }, 80);
+  }
+  function closeModal(){
+    modal.classList.remove('open');
+    document.body.style.overflow = '';
+    if(lastFocus && lastFocus.focus){ lastFocus.focus(); lastFocus = null; }
+  }
+  jieBtn.addEventListener('click', openModal);
+  modalOverlay.addEventListener('click', closeModal);
+  modalClose.addEventListener('click', closeModal);
+  /* ESC 关闭 */
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' && modal.classList.contains('open')) closeModal();
+  });
+  /* 焦点圈定：Tab 在弹窗内循环 */
+  modal.addEventListener('keydown', function(e){
+    if(e.key !== 'Tab') return;
+    var f = modal.querySelectorAll('button, [href], input, [tabindex]:not([tabindex="-1"])');
+    if(!f.length) return;
+    var first = f[0], last = f[f.length-1];
+    if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+    else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+  });
+
+  /* 提问输入：回车抽签（焦点在输入框时不触发翻书，仅回车提交） */
+  questionInput.addEventListener('keydown', function(e){
+    if(e.key === 'Enter'){ e.preventDefault(); trigger(); }
+  });
+
+  book.addEventListener('click', function(e){
+    if(e.target && e.target.closest && (e.target.closest('#askBtn') || e.target.closest('#jieBtn'))) return;
+    trigger();
+  });
+  askBtn.addEventListener('click', function(e){ e.stopPropagation(); askAgain(); });
+  book.addEventListener('keydown', function(e){
+    if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); trigger(); }
+  });
+})();
+</script>
+</body>
+</html>
