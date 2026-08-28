@@ -7,8 +7,8 @@ window.PROJECTS = [
   {
     "title": "答案之书-古文言",
     "desc": "答案之书名著典籍文言文版",
-    "url": "ansbook.html",
-    "linkText": "ansbook/ansbook.html",
+    "url": "ansbook/ansbook.html",
+    "linkText": "ansbook.html",
     "gradient": "ansbook",
     "aiTag": "名著典籍"
   },
@@ -16,7 +16,7 @@ window.PROJECTS = [
     "title": "Roguelike 小游戏",
     "desc": "一款简易的 Roguelike 地牢探索网页游戏",
     "url": "roguelike/index.html",
-    "linkText": "roguelike/index.html",
+    "linkText": "roguelike.html",
     "gradient": "roguelike",
     "aiTag": "AI 关卡生成"
   },
