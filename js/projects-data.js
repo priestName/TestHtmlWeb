@@ -5,6 +5,14 @@
  */
 window.PROJECTS = [
   {
+    "title": "答案之书-古文言",
+    "desc": "答案之书名著典籍文言文版",
+    "url": "ansbook.html",
+    "linkText": "ansbook/ansbook.html",
+    "gradient": "ansbook",
+    "aiTag": "名著典籍"
+  },
+  {
     "title": "Roguelike 小游戏",
     "desc": "一款简易的 Roguelike 地牢探索网页游戏",
     "url": "roguelike/index.html",
@@ -42,5 +50,4 @@ window.PROJECTS = [
     "linkText": "Christmas_tree.html",
     "gradient": "xmas"
   },
-
 ];
