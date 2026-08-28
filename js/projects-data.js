@@ -10,6 +10,7 @@ window.PROJECTS = [
     "url": "ansbook/ansbook.html",
     "linkText": "ansbook.html",
     "gradient": "ansbook",
+    "thumbnail": "thumbnails/ansbook.png",
     "aiTag": "名著典籍"
   },
   {
@@ -18,6 +19,7 @@ window.PROJECTS = [
     "url": "roguelike/index.html",
     "linkText": "roguelike.html",
     "gradient": "roguelike",
+    "thumbnail": "thumbnails/roguelike.png",
     "aiTag": "AI 关卡生成"
   },
   {
@@ -25,7 +27,8 @@ window.PROJECTS = [
     "desc": "传统小六壬占卜法的网页实现",
     "url": "xiaoliuren.html",
     "linkText": "xiaoliuren.html",
-    "gradient": "liuren"
+    "gradient": "liuren",
+    "thumbnail": "thumbnails/xiaoliuren.png"
   },
   {
     "title": "易经大乐透生成器",
@@ -33,6 +36,7 @@ window.PROJECTS = [
     "url": "yjcaipiao.html",
     "linkText": "yjcaipiao.html",
     "gradient": "yijing",
+    "thumbnail": "thumbnails/yjcaipiao.png",
     "aiTag": "AI 卦象解析"
   },
   {
@@ -41,6 +45,7 @@ window.PROJECTS = [
     "url": "caipiao.html",
     "linkText": "caipiao.html",
     "gradient": "lottery",
+    "thumbnail": "thumbnails/caipiao.png",
     "aiTag": "AI 随机算法"
   },
   {
@@ -48,6 +53,7 @@ window.PROJECTS = [
     "desc": "CSS 绘制的动态圣诞树，节日氛围满满",
     "url": "Christmas_tree.html",
     "linkText": "Christmas_tree.html",
-    "gradient": "xmas"
+    "gradient": "xmas",
+    "thumbnail": "thumbnails/Christmas_tree.png"
   },
 ];

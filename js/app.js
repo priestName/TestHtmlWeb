@@ -11,21 +11,47 @@
  * @param {string} project.url - 项目链接地址
  * @param {string} project.linkText - 卡片底部显示的链接文本
  * @param {string} project.gradient - 渐变类型 (lottery/yijing/liuren/xmas/roguelike)
+ * @param {string} [project.thumbnail] - 缩略图相对路径 (可选)
  * @param {string} [project.aiTag] - AI 标签文本 (可选)
  * @returns {string} 卡片 HTML 字符串
  */
-function createCardHTML(project) {
+function createCardHTML(project, animDelay) {
   var aiTagHTML = project.aiTag
     ? '<span class="ai-tag">' + escapeHTML(project.aiTag) + '</span>'
     : '';
 
+  // 缩略图：优先使用真实页面截图；无 thumbnail 字段时直接显示渐变
+  // - loading="lazy" 懒加载；decoding="async" 异步解码避免阻塞
+  // - onload 触发 .card-thumb--loaded 切换 opacity（与 CSS 配合实现淡入）
+  // - onerror 时隐藏 img，让底层渐变作为兜底
+  var thumbHTML = '';
+  if (project.thumbnail) {
+    thumbHTML = '<img class="card-thumb" src="' + escapeAttr(project.thumbnail) +
+      '" alt="' + escapeAttr(project.title) +
+      '" loading="lazy" decoding="async"' +
+      ' onload="this.classList.add(\'card-thumb--loaded\')"' +
+      ' onerror="this.style.display=\'none\'">';
+  }
+
+  // stagger 入场动画延迟（renderCards 传入）
+  var animStyle = (typeof animDelay === 'number' && animDelay > 0)
+    ? ' style="animation-delay:' + animDelay + 'ms"'
+    : '';
+
   return '' +
-    '<a href="' + escapeAttr(project.url) + '" target="_blank" rel="noopener" class="card">' +
-      '<div class="card-image card-image--' + escapeAttr(project.gradient) + '"></div>' +
+    '<a href="' + escapeAttr(project.url) + '" target="_blank" rel="noopener" class="card" aria-label="' + escapeAttr(project.title) + '"' + animStyle + '>' +
+      '<div class="card-image card-image--' + escapeAttr(project.gradient) + '">' +
+        thumbHTML +
+        '<span class="card-shine" aria-hidden="true"></span>' +
+      '</div>' +
       '<div class="card-body">' +
         '<h3 class="card-title">' + escapeHTML(project.title) + '</h3>' +
         '<p class="card-desc">' + escapeHTML(project.desc) + '</p>' +
-        '<p class="card-link">' + escapeHTML(project.linkText) + ' \u2192</p>' +
+        '<p class="card-link">' + escapeHTML(project.linkText) +
+          ' <svg class="card-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' +
+            '<path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' +
+          '</svg>' +
+        '</p>' +
         aiTagHTML +
       '</div>' +
     '</a>';
@@ -92,17 +118,22 @@ function renderCards(container, projects, limit, showPlaceholder) {
 
   var list = limit > 0 ? projects.slice(0, limit) : projects;
   var html = '';
+  var realCount = 0;
 
   for (var i = 0; i < list.length; i++) {
-    html += createCardHTML(list[i]);
+    // stagger 动画：每张延迟 60ms 入场，提升列表渐显观感
+    html += createCardHTML(list[i], realCount * 60);
+    realCount++;
   }
 
   if (showPlaceholder) {
     // 不足 6 个时用占位卡补齐到 6 个
-    var total = list.length;
+    var total = realCount;
     var needed = total < 6 ? 6 - total : (total % 3 === 0 ? 0 : 3 - (total % 3));
     for (var j = 0; j < needed; j++) {
-      html += createPlaceholderHTML();
+      // 占位卡沿用 stagger（紧跟真实卡片之后）
+      html += createPlaceholderHTML(realCount * 60);
+      realCount++;
     }
   }
 
