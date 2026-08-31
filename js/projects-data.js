@@ -10,7 +10,7 @@ window.PROJECTS = [
     "url": "ansbook/ansbook.html",
     "linkText": "ansbook.html",
     "gradient": "ansbook",
-    "thumbnail": "thumbnails/ansbook.png",
+    "thumbnail": "thumbnails/ansbook.jpg",
     "aiTag": "名著典籍"
   },
   {
@@ -19,7 +19,7 @@ window.PROJECTS = [
     "url": "roguelike/index.html",
     "linkText": "roguelike.html",
     "gradient": "roguelike",
-    "thumbnail": "thumbnails/roguelike.png",
+    "thumbnail": "thumbnails/roguelike.jpg",
     "aiTag": "AI 关卡生成"
   },
   {
@@ -28,7 +28,7 @@ window.PROJECTS = [
     "url": "xiaoliuren.html",
     "linkText": "xiaoliuren.html",
     "gradient": "liuren",
-    "thumbnail": "thumbnails/xiaoliuren.png"
+    "thumbnail": "thumbnails/xiaoliuren.jpg"
   },
   {
     "title": "易经大乐透生成器",
@@ -36,7 +36,7 @@ window.PROJECTS = [
     "url": "yjcaipiao.html",
     "linkText": "yjcaipiao.html",
     "gradient": "yijing",
-    "thumbnail": "thumbnails/yjcaipiao.png",
+    "thumbnail": "thumbnails/yjcaipiao.jpg",
     "aiTag": "AI 卦象解析"
   },
   {
@@ -45,7 +45,7 @@ window.PROJECTS = [
     "url": "caipiao.html",
     "linkText": "caipiao.html",
     "gradient": "lottery",
-    "thumbnail": "thumbnails/caipiao.png",
+    "thumbnail": "thumbnails/caipiao.jpg",
     "aiTag": "AI 随机算法"
   },
   {
@@ -54,6 +54,6 @@ window.PROJECTS = [
     "url": "Christmas_tree.html",
     "linkText": "Christmas_tree.html",
     "gradient": "xmas",
-    "thumbnail": "thumbnails/Christmas_tree.png"
+    "thumbnail": "thumbnails/Christmas_tree.jpg"
   },
 ];

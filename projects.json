@@ -5,7 +5,7 @@
     "url": "ansbook.html",
     "linkText": "ansbook/ansbook.html",
     "gradient": "ansbook",
-    "thumbnail": "thumbnails/ansbook.png",
+    "thumbnail": "thumbnails/ansbook.jpg",
     "aiTag": "名著典籍"
   },
   {
@@ -14,7 +14,7 @@
     "url": "caipiao.html",
     "linkText": "caipiao.html",
     "gradient": "lottery",
-    "thumbnail": "thumbnails/caipiao.png",
+    "thumbnail": "thumbnails/caipiao.jpg",
     "aiTag": "AI 随机算法"
   },
   {
@@ -23,7 +23,7 @@
     "url": "yjcaipiao.html",
     "linkText": "yjcaipiao.html",
     "gradient": "yijing",
-    "thumbnail": "thumbnails/yjcaipiao.png",
+    "thumbnail": "thumbnails/yjcaipiao.jpg",
     "aiTag": "AI 卦象解析"
   },
   {
@@ -32,7 +32,7 @@
     "url": "xiaoliuren.html",
     "linkText": "xiaoliuren.html",
     "gradient": "liuren",
-    "thumbnail": "thumbnails/xiaoliuren.png"
+    "thumbnail": "thumbnails/xiaoliuren.jpg"
   },
   {
     "title": "圣诞树动画",
@@ -40,7 +40,7 @@
     "url": "Christmas_tree.html",
     "linkText": "Christmas_tree.html",
     "gradient": "xmas",
-    "thumbnail": "thumbnails/Christmas_tree.png"
+    "thumbnail": "thumbnails/Christmas_tree.jpg"
   },
   {
     "title": "Roguelike 小游戏",
@@ -48,7 +48,7 @@
     "url": "roguelike/index.html",
     "linkText": "roguelike/index.html",
     "gradient": "roguelike",
-    "thumbnail": "thumbnails/roguelike.png",
+    "thumbnail": "thumbnails/roguelike.jpg",
     "aiTag": "AI 关卡生成"
   }
 ]
